@@ -1,0 +1,103 @@
+/* Empty. Add your own CSS if you like */
+.view-container  ion-content {
+	background: url("../img/background.png") no-repeat scroll 0 0 / 100% 100%;
+	color: #e5e5e5;
+	font-size: 13px;
+}
+.bar-trading-app .bar-header {
+	background-color: #f39000;
+}
+
+.bar-trading-app .bar-header .title {
+	color: #F8F8F8;
+}
+
+.account-info .bar-light {
+	background-color: rgba(100, 100, 100, 0.7);
+    border-radius: 4px;
+    vertical-align: middle;
+    color: #e5e5e5;
+    height: 35px;
+    line-height: 22px;
+    background-image: none;
+}
+
+.back-button {
+	color: #F8F8F8 !important;
+}
+
+.icon-ios-trading:before {
+	background: url('../img/IconTrading.png') no-repeat;
+}
+
+.icon-ios-trading-active:before {
+	background: url('../img/IconTradingActive.png') no-repeat;
+}
+
+.icon-ios-account:before {
+	background: url('../img/IconAccount.png') no-repeat;
+}
+
+.icon-ios-account-active:before {
+	background: url('../img/IconAccountActive.png') no-repeat;
+}
+.tab-title {
+	color: #F8F8F8;
+}
+
+.tabs-ios-icons .tab-nav .icon:before {
+	content:  ' ';
+	display: block;
+	margin-left: 60px;
+	height: 28px;
+	width: 32px;
+}
+
+.account-list .item-radio {
+	background-color: transparent;
+	color: #e5e5e5;
+}
+
+.account-list .item-radio .item-content {
+	background-color: rgba(255, 255, 255, 0.25); 
+}
+
+.account-list .item-radio input:checked + .radio-content .item-content {
+	background-color: rgba(155, 255, 255, 0.2);
+}
+
+
+.tabs-ios-icons .tab-item-active .tab-title {
+	color: #f39000;
+}
+
+.portfolio .bar {
+	position: relative;
+}
+
+.portfolio .profit {
+	width: 100%;
+}
+
+.portfolio .row.header {
+	border-bottom: 1px solid #cecece;
+    margin-bottom: 10px;
+    font-weight: bold;
+
+}
+
+.portfolio .account-info {
+	width: 100%;
+	text-align: right;
+}
+
+.loading-container .loading {
+	background-color: rgba(0, 0, 0, 0) !important;
+}
+
+.row.even {
+	background-color: rgba(0, 0, 0, 0.2);
+}
+.row {
+	margin-top: 0px !important;
+}

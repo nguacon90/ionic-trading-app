@@ -1,0 +1,16 @@
+<!--
+Create tabs with an icon and label, using the tabs-positive style.
+Each tab's child <ion-nav-view> directive will have its own
+navigation history that also transitions its views in and out.
+-->
+<ion-tabs class="tabs-ios-icons tabs-icon-top tabs-color-active-positive tabs-dark">
+
+  <ion-tab title="Tài khoản" icon-off="icon-ios-account" icon-on="icon-ios-account-active" href="#/tab/account" ng-click="checkLogin(this);">
+    <ion-nav-view name="tab-account"></ion-nav-view>
+  </ion-tab>
+
+  <ion-tab title="Giao dịch" icon-off="icon-ios-trading" icon-on="icon-ios-trading-active" href="#/tab/trading" >
+    <ion-nav-view name="tab-trading"></ion-nav-view>
+  </ion-tab>
+
+</ion-tabs>

@@ -1,0 +1,7 @@
+<ion-view view-title="Số tài khoản">
+	<ion-content class="account-list">
+		<ion-list>
+		  <ion-radio ng-repeat="account in customerInfo.accounts" ng-model="customerInfo.activeAccount" ng-change="loadAccountInfo()" ng-value="account.accountNumber">{{account.accountNumber}}</ion-radio>
+		</ion-list>
+	</ion-content>
+</ion-view>
