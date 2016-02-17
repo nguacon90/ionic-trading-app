@@ -1,0 +1,1 @@
+# ionic-trading-app
