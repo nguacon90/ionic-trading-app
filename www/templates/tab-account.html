@@ -1,28 +1,47 @@
 <meta name="format-detection" content="telephone=no">
 
 <ion-view class="account-info" view-title="{{customerInfo.customerName ? customerInfo.customerName  : ''}}">
-  <ion-content class="padding portfolio">
-        <div class="bar bar-light">
-	      <div class="profit">Lãi: <span class="{{customerInfo.portfolio.profit | colorFilter}}">{{customerInfo.portfolio.profit > 0 ? '+' : ''}}{{customerInfo.portfolio.profit | number:0}} đ</span></div>
-	      <div class="account-info" on-touch="showAccountList()">Tài khoản: <span ng-bind="customerInfo.activeAccount"></span> <i class="ion-chevron-right"> </i>
-	      </div>
+  	<ion-header class="bar-positive bar-subheader">
+  		<div class="tabs-striped tabs-top tabs-background-dark tabs-color-energized">
+		  	<div class="tabs">
+		  		<a class="tab-item {{tabInfo.selectedTab == 'portfolio' ? 'active' : ''}}" id="portfolio" on-touch="selectTab($event);">
+			        DANH MỤC
+			    </a>
+			    <a class="tab-item {{tabInfo.selectedTab == 'asset' ? 'active' : ''}}" id="asset" on-touch="selectTab($event);">
+			        TÀI SẢN
+			    </a>
+			</div>
+		</div> 
+		<div ng-show="tabInfo.selectedTab == 'portfolio'">
+			<div class="bar bar-light">
+		      <div class="profit">Lãi: <span class="{{customerInfo.portfolio.profit | colorFilter}}">{{customerInfo.portfolio.profit > 0 ? '+' : ''}}{{customerInfo.portfolio.profit | number:0}} đ</span></div>
+		      <div class="account-number" on-touch="showAccountList()">Tài khoản: <span ng-bind="customerInfo.activeAccount"></span> <i class="ion-chevron-right"> </i>
+		      </div>
+		    </div>
+		    <div class="row header">
+		      <div class="col">Mã CK</div>
+		      <div class="col">KL</div>
+		      <div class="col">Giá vốn</div>
+		      <div class="col">Giá khớp</div>
+		      <div class="col">Lãi</div>
+		    </div>
 	    </div>
-        <div class="row header">
-          <div class="col">Mã CK</div>
-          <div class="col">KL</div>
-          <div class="col">Giá vốn</div>
-          <div class="col">Giá khớp</div>
-          <div class="col">Lãi</div>
+  	</ion-header>
+  	<ion-content class="padding portfolio has-subheader">
+  		<div ng-show="tabInfo.selectedTab == 'portfolio'">
+	        <div ng-if="customerInfo.portfolio.stocks.length > 0" class="row {{($index + 1) % 2 == 0 ? 'even' : 'odd'}}" ng-repeat="stock in customerInfo.portfolio.stocks">
+	          <div class="col">{{stock.symbol}}</div>
+	          <div class="col">{{stock.quantity | number}}</div>
+	          <div class="col">{{stock.costPrice | number}}</div>
+	          <div class="col">{{stock.currentPrice | number}}</div>
+	          <div class="col {{stock.gainLossRatio | colorFilter}}">{{stock.gainLossRatio > 0 ? '+' : ''}}{{stock.gainLossRatio * 100 | number: 1}} %</div>
+	        </div>
+	        <div class="row" ng-if="customerInfo.portfolio.stocks.length == 0">
+	        	Chưa có mã nào trong danh mục của tài khoản này.
+	        </div>
         </div>
-        <div ng-if="customerInfo.portfolio.stocks.length > 0" class="row {{($index + 1) % 2 == 0 ? 'even' : 'odd'}}" ng-repeat="stock in customerInfo.portfolio.stocks">
-          <div class="col">{{stock.symbol}}</div>
-          <div class="col">{{stock.quantity | number}}</div>
-          <div class="col">{{stock.costPrice | number}}</div>
-          <div class="col">{{stock.currentPrice | number}}</div>
-          <div class="col {{stock.gainLossRatio | colorFilter}}">{{stock.gainLossRatio > 0 ? '+' : ''}}{{stock.gainLossRatio * 100 | number: 1}} %</div>
+        <div ng-show="tabInfo.selectedTab == 'asset'">
+        aaaaa
         </div>
-        <div class="row" ng-if="customerInfo.portfolio.stocks.length == 0">
-        	Chưa có mã nào trong danh mục của tài khoản này.
-        </div>
-  </ion-content>
+  	</ion-content>
 </ion-view>

@@ -6,22 +6,22 @@ angular.module('tradingApp.controllers', [])
   $scope.targetHref = '#/tab/account';
   
   $scope.loadAll = function() {
-    console.log('loadAll: ', $scope.customerInfo);
-     if($scope.customerInfo) {
-      return;
-     }
-     var token = $cookies.get('accessToken');
-     tradingService.loadCustomer(token).then(function(response){
-        
-        $scope.customerInfo = response.data;
-        $scope.customerInfo.activeAccount = $scope.customerInfo.accounts[0].accountNumber;
-        $scope.loadPortfolio();
-     }, function(jqXHR){
-        if (jqXHR.data.error == 'AUTH-04' || jqXHR.data.error == 'AUTH-01') {
-          $cookies.remove('accessToken');
-          $scope.showLogin();
-        }
-     });
+  
+   if($scope.customerInfo) {
+    return;
+   }
+   var token = $cookies.get('accessToken');
+   tradingService.loadCustomer(token).then(function(response){
+      
+      $scope.customerInfo = response.data;
+      $scope.customerInfo.activeAccount = $scope.customerInfo.accounts[0].accountNumber;
+      $scope.loadPortfolio();
+   }, function(jqXHR){
+      if (jqXHR.data.error == 'AUTH-04' || jqXHR.data.error == 'AUTH-01') {
+        $cookies.remove('accessToken');
+        $scope.showLogin();
+      }
+   });
   };
 
   $scope.loadPortfolio = function() {
@@ -97,6 +97,15 @@ angular.module('tradingApp.controllers', [])
 .controller('AccountCtrl', function($scope, $state) {
   
     $scope.loadAll();
+    $scope.tabInfo = {
+      selectedTab : 'portfolio'
+    };
+
+    $scope.selectTab = function(event) {
+      
+      $scope.tabInfo.selectedTab = event.target.id;
+      
+    };
 
     $scope.showAccountList = function() {
       $state.go('tab.account-list');
@@ -126,6 +135,10 @@ angular.module('tradingApp.controllers', [])
 })
 
 .controller('TradingCtrl', function($scope) {
+  
+})
+
+.controller('MenuCtrl', function($scope) {
   
 })
 

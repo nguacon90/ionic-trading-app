@@ -38,7 +38,6 @@ angular.module('tradingApp', ['ionic', 'tradingApp.controllers', 'tradingApp.ser
     templateUrl: 'templates/tabs.html',
     controller: 'TabCtrl'
   })
-
   // Each tab has its own nav history stack:
 
   .state('tab.account', {
@@ -68,7 +67,17 @@ angular.module('tradingApp', ['ionic', 'tradingApp.controllers', 'tradingApp.ser
           controller: 'TradingCtrl'
         }
       }
-    });
+    })
+
+  .state('tab.menu', {
+    url: '/menu',
+    views: {
+      'tab-menu' : {
+        templateUrl: 'templates/tab-menu.html',
+        controller: 'MenuCtrl'
+      }
+    }
+  });
 
   // if none of the above states are matched, use this as the fallback
   $urlRouterProvider.otherwise('/tab/account');
