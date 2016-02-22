@@ -31,7 +31,7 @@ ion-view {
 }
 .account-info .has-subheader {
 	margin-top: 85px;
-	overflow: scroll;
+	overflow: auto;
 }
 .back-button {
 	color: #F8F8F8 !important;
@@ -85,6 +85,12 @@ ion-view {
 .account-list .item-radio {
 	background-color: transparent;
 	color: #e5e5e5;
+	padding: 0px;
+	line-height: 10px;
+}
+
+.account-list .ion-checkmark {
+	padding-top: 6px;
 }
 
 .account-list .item-radio .item-content {
@@ -116,7 +122,7 @@ ion-view {
 	height: 95px;
 }
 
-.account-info .bar-subheader .row.header {
+.account-info .bar-subheader .row.header, .assets-info .row.header {
 	border-bottom: 1px solid #cecece;
     margin-bottom: 10px;
     font-weight: bold;
@@ -170,7 +176,114 @@ ion-view {
 
 }
 
+.loginPage .popup-head .popup-title {
+	background: url('../img/logo.png') no-repeat;
+	background-size: 100%;
+	display: block;
+	height: 45px;
 
+}
 
+.loginPage .popup-head {
+	margin: auto;
+	width: 180px;
+}
+.loginPage .popup, .errorPopup .popup {
+	width: 290px;
+	border-radius: 10px;
+}
 
+.errorPopup .button-positive {
+	flex: unset;
+    height: 30px;
+    min-height: 0;
+    min-width: 0;
+    max-width: 80px;
+}
 
+.errorPopup .popup-buttons {
+	margin: auto;
+	width: 80px;
+}
+
+.errorPopup .popup-body {
+	text-align: center;
+}
+
+.errorPopup .popup-title {
+	font-weight: bold;
+}
+
+.loginPage p {
+	font-size: 12px;
+    text-align: center;
+}
+
+.loginPage .item-input {
+	background-color: rgba(140, 140, 140, 0.1);
+	padding: 0 0 0 16px;
+}
+.loginPage label.item {
+	border-color: #cecece;
+	border-width: 0;
+}
+
+.loginPage .list-inset {
+	border-radius: 5px;
+	border: 1px solid #cecece;
+}
+.loginPage .popup-body {
+	padding: 0 10px;
+}
+
+.loginPage .popup-buttons {
+	min-height: 30px;
+	margin: auto;
+}
+
+.loginPage .button {
+    border-radius: 5px;
+    color: #fff;
+    flex: unset;
+    height: 35px;
+    line-height: 10px;
+    min-height: 0;
+    padding: 10px;
+    width: 120px;
+    border: 1px solid #f39000;
+    min-width: 0;
+    font-size: 14px;
+    font-weight: normal;
+}
+
+.loginPage .button-default {
+	background-color: #f39000;
+}
+
+.loginPage .button-positive, .loginPage .button-positive:HOVER {
+	background-color: transparent;
+	color: #f39000;
+}
+
+.loginPage .ion-close {
+	position: absolute; 
+	top: 8px; 
+	right: 13px;
+}
+
+.assets-info .item {
+	padding: 8px 5px;
+    background-color: transparent;
+    border: 0;
+    color: #e5e5e5;
+    font-size: 14px
+}
+
+.item.even {
+	background-color: rgba(0, 0, 0, 0.3);
+}
+
+.item.item-divider {
+	color: #f39000;
+	font-weight: bold;
+}

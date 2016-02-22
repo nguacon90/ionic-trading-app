@@ -1,6 +1,7 @@
 <meta name="format-detection" content="telephone=no">
 
-<ion-view class="account-info" view-title="{{customerInfo.customerName ? customerInfo.customerName  : ''}}">
+<ion-view class="account-info">
+	<ion-nav-title>{{customerInfo.customerName ? customerInfo.customerName  : 'TÀI KHOẢN'}}</ion-nav-title>
   	<ion-header class="bar-positive bar-subheader">
   		<div class="tabs-striped tabs-top tabs-background-dark tabs-color-energized">
 		  	<div class="tabs">
@@ -12,13 +13,17 @@
 			    </a>
 			</div>
 		</div> 
-		<div ng-show="tabInfo.selectedTab == 'portfolio'">
+		<div>
 			<div class="bar bar-light">
-		      <div class="profit">Lãi: <span class="{{customerInfo.portfolio.profit | colorFilter}}">{{customerInfo.portfolio.profit > 0 ? '+' : ''}}{{customerInfo.portfolio.profit | number:0}} đ</span></div>
+		      <div class="profit" ng-show="tabInfo.selectedTab == 'portfolio'">Lãi: <span class="{{customerInfo.portfolio.profit | colorFilter}}">{{customerInfo.portfolio.profit > 0 ? '+' : ''}}{{customerInfo.portfolio.profit | number:0}} đ</span></div>
+		      <div class="profit" ng-show="tabInfo.selectedTab == 'asset'">
+		      	Sức mua: {{customerInfo.pp0 | number: 0}} đ
+		      </div>
 		      <div class="account-number" on-touch="showAccountList()">Tài khoản: <span ng-bind="customerInfo.activeAccount"></span> <i class="ion-chevron-right"> </i>
 		      </div>
 		    </div>
-		    <div class="row header">
+
+		    <div class="row header" ng-show="tabInfo.selectedTab == 'portfolio'">
 		      <div class="col">Mã CK</div>
 		      <div class="col">KL</div>
 		      <div class="col">Giá vốn</div>
@@ -40,8 +45,66 @@
 	        	Chưa có mã nào trong danh mục của tài khoản này.
 	        </div>
         </div>
-        <div ng-show="tabInfo.selectedTab == 'asset'">
-        aaaaa
+        <div ng-show="tabInfo.selectedTab == 'asset'" class="assets-info">
+       		<div class="list">
+			  <div class="item item-divider">Tổng quan</div>
+			  <div class="item">
+			    Giá trị tài sản ròng
+		        <span class="item-note">
+			      {{customerInfo.assets.nav | number : 0}}
+			    </span>
+			  </div>
+			  <div class="item even">
+			    Giá trị chứng khoán
+			    <span class="item-note">
+			      {{customerInfo.assets.marketValueOfShares | number : 0}}
+			    </span>
+			  </div>
+			  <div class="item">
+			    Tiền tối đa còn được ứng trước
+			    <span class="item-note">
+			      {{customerInfo.assets.availableAdvancePayments | number : 0}}
+			    </span>
+			  </div>
+			  <div class="item even">
+			    Tiền gửi hỗ trợ lãi suất
+			    <span class="item-note">
+			      {{customerInfo.assets.termDeposit | number : 0}}
+			    </span>
+			  </div>
+			  <div class="item">
+			    Tiền được rút
+			    <span class="item-note">
+			      {{customerInfo.assets.withdrawal | number : 0}}
+			    </span>
+			  </div>
+			  <div class="item even">
+			  	Nợ
+			  	<span class="item-note">
+			      {{customerInfo.assets.advancePurchase | number : 0}}
+			    </span>
+			  </div>
+			
+			  	<div class="item item-divider">Trạng thái chứng khoán</div>
+			  	<div class="row header">
+			      <div class="col">Mã</div>
+			      <div class="col">Giao dịch</div>
+			      <div class="col">Chờ về</div>
+			      <div class="col">Kí quỹ</div>
+			      <div class="col">Tổng</div>
+			    </div>
+	          	<div ng-if="customerInfo.stocksInfo.stocks.length > 0" class="row {{($index + 1) % 2 == 0 ? 'even' : 'odd'}}" ng-repeat="stock in customerInfo.stocksInfo.stocks">
+		          	<div class="col">{{stock.symbol}}</div>
+		          	<div class="col">{{stock.available | number}}</div>
+		          	<div class="col">{{stock.receiving | number}}</div>
+		          	<div class="col">{{stock.secure | number}}</div>
+		        	<div class="col">{{stock.total | number}}</div>
+		        </div>
+		        <div class="row" ng-if="customerInfo.stocksInfo.stocks.length == 0">
+		        	Chưa có mã nào trong danh sách chứng khoán của tài khoản này.
+		        </div>
+        
+
         </div>
   	</ion-content>
 </ion-view>

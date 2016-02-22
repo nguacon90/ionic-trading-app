@@ -2,6 +2,9 @@ angular.module('tradingApp.services', [])
 .factory('tradingService', function($http, $q, $log){
   var loginUrl = 'https://auth-api.vndirect.com.vn/auth',
       getPortfolioUrl = 'https://trade-api.vndirect.com.vn/accounts/{id}/portfolio',
+      getPP0Url = 'https://trade-api.vndirect.com.vn/accounts/{id}/assets',
+      accountsUrl = 'https://trade-api.vndirect.com.vn/accounts',
+      getStocksUrl = 'https://trade-api.vndirect.com.vn/accounts/{id}/stocks',
       customerUrl = 'https://trade-api.vndirect.com.vn/customer';
   ajaxJson = function(method, url, token, data) {
     if (method !== 'get') {
@@ -31,9 +34,21 @@ angular.module('tradingApp.services', [])
       return ajaxJson('get', customerUrl, token);
     },
 
-    loadLoadPortfolio: function(token, accountNumber) {
+    loadPortfolio: function(token, accountNumber) {
       var url = getPortfolioUrl.replace('{id}', accountNumber);
       return ajaxJson('get', url, token);
+    },
+
+    loadAssets: function(token, accountNumber) {
+      var url = getPP0Url.replace('{id}', accountNumber);
+      return ajaxJson('get', url, token);
+    }, 
+    loadAccounts: function(token) {
+       return ajaxJson('get', accountsUrl, token); 
+    },
+    loadStocks: function(token, accountNumber) {
+        var url = getStocksUrl.replace('{id}', accountNumber);
+        return ajaxJson('get', url, token);
     }
 
   }
