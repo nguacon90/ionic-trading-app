@@ -33,6 +33,9 @@ ion-view {
 	margin-top: 85px;
 	overflow: auto;
 }
+.asset .has-subheader {
+	margin-top: 65px;
+}
 .back-button {
 	color: #F8F8F8 !important;
 }
@@ -106,16 +109,16 @@ ion-view {
 	color: #f39000;
 }
 
-.portfolio .bar {
-	position: relative;
-}
-
 .account-info .profit {
 	width: 100%;
 }
 
 .account-info .bar-subheader {
 	height: 180px;
+}
+
+.asset .bar-subheader {
+	height: 160px;
 }
 
 .account-info .tabs-top.tabs-striped {
@@ -147,8 +150,8 @@ ion-view {
 }
 
 .menu-trading .item {
-	padding-top: 6px;
-	padding-bottom: 6px;
+	padding-top: 10px;
+	padding-bottom: 10px;
 	width: 100%; 
 	background-color: rgba(100, 100, 100, 0.5);
 	border: none;

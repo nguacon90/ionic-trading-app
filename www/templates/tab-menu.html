@@ -2,11 +2,11 @@
 	<ion-content>
 		<div class="list">
 		  <div class="item item-divider" ng-bind="customerInfo.customerName ? customerInfo.customerName: 'TÀI KHOẢN'"></div>
-		  <a class="item item-icon-left" on-touch="goto('portfolio')">
+		  <a class="item item-icon-left" on-touch="goto('{{topMenu.accountInfo.portfolio}}')">
 		    <i class="icon ion-document-text"></i> Danh mục đầu tư
 		  </a>
 
-		  <a class="item item-icon-left" href="#">
+		  <a class="item item-icon-left" on-touch="goto('{{topMenu.accountInfo.asset}}')">
 		    <i class="icon ion-social-usd"></i>Tài Sản
 		  </a>
 

@@ -15,6 +15,13 @@ angular.module('tradingApp.controllers', [])
     }
   };
 
+  $scope.topMenu = {
+    accountInfo: {
+       portfolio: 'portfolio',
+       asset: 'asset'
+    }
+  };
+
   function init() {
     $scope.account = {};
     $scope.customerInfo = null;
@@ -176,18 +183,18 @@ angular.module('tradingApp.controllers', [])
   };
 
 })
-.controller('AccountCtrl', function($scope, $state) {
+.controller('AccountCtrl', function($scope, $state, $ionicGesture) {
   
     $scope.loadAll();
     $scope.tabInfo = {
-      selectedTab : 'portfolio'
+      selectedTab : $scope.topMenu.accountInfo.portfolio
     };
 
-    $scope.selectTab = function(event) {
-      
-      $scope.tabInfo.selectedTab = event.target.id;
-      
-    };
+    var portfolioElm = angular.element(document.querySelector('#portfolio')); 
+    handleTabEvent(portfolioElm);
+
+    var assetElm = angular.element(document.querySelector('#asset')); 
+    handleTabEvent(assetElm);
 
     $scope.showAccountList = function() {
       $state.go('tab.account-list');
@@ -199,6 +206,25 @@ angular.module('tradingApp.controllers', [])
       $scope.loadAssets();
       $scope.loadStocks();
       $state.go('tab.account');
+    };
+
+
+    function handleTabEvent(element) {
+      $ionicGesture.on('tap', function(e){
+          $scope.$applyAsync(function() {
+            $scope.tabInfo.selectedTab = e.target.id;
+            switch($scope.tabInfo.selectedTab) {
+              case $scope.topMenu.accountInfo.portfolio: 
+                 $scope.loadPortfolio();
+                 return;
+              case $scope.topMenu.accountInfo.asset: 
+                $scope.loadAssets();
+                $scope.loadStocks();
+                $scope.loadPP0();
+                return;
+            }
+          });    
+      }, element);
     };
 })
 
@@ -230,9 +256,11 @@ angular.module('tradingApp.controllers', [])
     };
 
     $scope.goto = function(tabId) {
-        if(tabId == 'portfolio') {
+        if(tabId == $scope.topMenu.accountInfo.portfolio ||
+          tabId == $scope.topMenu.accountInfo.asset) {
           $state.go('tab.account');
-          document.getElementById('portfolio').click();
+          var element = document.getElementById(tabId);
+          ionic.trigger('tap', {target: element}, false, false);
         }
     };
 })
