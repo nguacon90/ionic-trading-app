@@ -5,11 +5,11 @@ navigation history that also transitions its views in and out.
 -->
 <ion-tabs class="tabs-ios-icons tabs-icon-top tabs-color-active-positive tabs-dark">
 
-  <ion-tab id="account-tab" title="Tài khoản" icon-off="icon-ios-account" icon-on="icon-ios-account-active" href="#/tab/account" on-select="loadData();">
+  <ion-tab id="accountPage" title="Tài khoản" icon-off="icon-ios-account" icon-on="icon-ios-account-active" href="#/tab/account" ng-click="loadData(0);">
     <ion-nav-view name="tab-account"></ion-nav-view>
   </ion-tab>
 
-  <ion-tab title="Giao dịch" icon-off="icon-ios-trading" icon-on="icon-ios-trading-active" href="#/tab/trading" on-select="loadData();">
+  <ion-tab id="tradingPage" title="Giao dịch" icon-off="icon-ios-trading" icon-on="icon-ios-trading-active" href="#/tab/trading" ng-click="loadData(1);">
     <ion-nav-view name="tab-trading"></ion-nav-view>
   </ion-tab>
 

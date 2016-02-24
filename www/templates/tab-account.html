@@ -13,23 +13,21 @@
 			    </a>
 			</div>
 		</div> 
-		<div>
-			<div class="bar bar-light">
-		      <div class="profit" ng-show="tabInfo.selectedTab == 'portfolio'">Lãi: <span class="{{customerInfo.portfolio.profit | colorFilter}}">{{customerInfo.portfolio.profit > 0 ? '+' : ''}}{{customerInfo.portfolio.profit | number:0}} đ</span></div>
-		      <div class="profit" ng-show="tabInfo.selectedTab == 'asset'">
-		      	Sức mua: {{customerInfo.pp0 | number: 0}} đ
-		      </div>
-		      <div class="account-number" on-touch="showAccountList()">Tài khoản: <span ng-bind="customerInfo.activeAccount"></span> <i class="ion-chevron-right"> </i>
-		      </div>
-		    </div>
+		<div class="bar bar-light">
+	      <div class="profit" ng-show="tabInfo.selectedTab == 'portfolio'">Lãi: <span class="{{customerInfo.portfolio.profit | colorFilter}}">{{customerInfo.portfolio.profit > 0 ? '+' : ''}}{{customerInfo.portfolio.profit | number:0}} đ</span></div>
+	      <div class="profit" ng-show="tabInfo.selectedTab == 'asset'">
+	      	Sức mua: {{customerInfo.pp0 | number: 0}} đ
+	      </div>
+	      <div class="account-number" on-touch="showAccountList('tab.account-list')">Tài khoản: <span ng-bind="customerInfo.activeAccount"></span> <i class="ion-chevron-right"> </i>
+	      </div>
+	    </div>
 
-		    <div class="row header" ng-show="tabInfo.selectedTab == 'portfolio'">
-		      <div class="col">Mã CK</div>
-		      <div class="col">KL</div>
-		      <div class="col">Giá vốn</div>
-		      <div class="col">Giá khớp</div>
-		      <div class="col">Lãi</div>
-		    </div>
+	    <div class="row header" ng-show="tabInfo.selectedTab == 'portfolio'">
+	      <div class="col">Mã CK</div>
+	      <div class="col">KL</div>
+	      <div class="col">Giá vốn</div>
+	      <div class="col">Giá khớp</div>
+	      <div class="col">Lãi</div>
 	    </div>
   	</ion-header>
   	<ion-content class="padding has-subheader">

@@ -2,68 +2,72 @@
 	<ion-content>
 		<div class="list">
 		  <div class="item item-divider" ng-bind="customerInfo.customerName ? customerInfo.customerName: 'TÀI KHOẢN'"></div>
-		  <a class="item item-icon-left" on-touch="goto('{{topMenu.accountInfo.portfolio}}')">
-		    <i class="icon ion-document-text"></i> Danh mục đầu tư
+		  <a class="item item-icon-left" on-touch="goto('{{topMenu.accountPage.portfolio}}')">
+		    <i class="icon ion-document-text"></i> 
+		    <span>Danh mục đầu tư</span>
 		  </a>
 
-		  <a class="item item-icon-left" on-touch="goto('{{topMenu.accountInfo.asset}}')">
-		    <i class="icon ion-social-usd"></i>Tài Sản
+		  <a class="item item-icon-left" on-touch="goto('{{topMenu.accountPage.asset}}')">
+		    <i class="icon ion-social-usd"></i>
+		    <span>Tài Sản</span>
 		  </a>
 
-		  <a class="item item-icon-left" href="#">
+		  <a class="item item-icon-left" >
 		    <i class="icon ion-android-menu"></i>
-		    Danh sách tài khoản
+		    <span>Danh sách tài khoản</span>
 		  </a>
 
-		  <a class="item item-icon-left" href="#">
+		  <a class="item item-icon-left" >
 		    <i class="icon ion-ios-camera"></i>
-		    Ảnh thẻ VTOS 
+		    <span>Ảnh thẻ VTOS</span>
 		  </a>
 
-		  <a class="item item-icon-left" href="#">
+		  <a class="item item-icon-left" >
 		    <i class="icon ion-key"></i>
-		    Đổi mật khẩu
+		    <span>Đổi mật khẩu</span>
 		  </a>
 
 		  <a class="item item-icon-left" on-touch="logout();">
 		    <i class="icon ion-log-out"></i>
-		    Đăng xuất
+		    <span>Đăng xuất</span>
 		  </a>
 		  
 		  <div class="item item-divider" ng-bind="'THỊ TRƯỜNG'"></div>
-		  <a class="item item-icon-left" href="#">
-		    <i class="icon ion-ios-pulse-strong"></i> Bảng giá
+		  <a class="item item-icon-left" >
+		    <i class="icon ion-ios-pulse-strong"></i> 
+		    <span>Bảng giá</span>
 		  </a>
 
-		  <a class="item item-icon-left" href="#">
-		    <i class="icon ion-ios-paper"></i>Tin tức
+		  <a class="item item-icon-left">
+		    <i class="icon ion-ios-paper"></i>
+		    <span>Tin tức</span>
 		  </a>
 		  
 
 		  <div class="item item-divider" ng-bind="'GIAO DỊCH'"></div>
-		  <a class="item item-icon-left" href="#">
+		  <a class="item item-icon-left">
 		    <i class="icon icon-trading-small"></i>
-		    Đặt lệnh
+		    <span>Đặt lệnh</span>
 		  </a>
 
-		  <a class="item item-icon-left" href="#">
+		  <a class="item item-icon-left" >
 		    <i class="icon ion-clipboard"></i>
-		    Sổ lệnh
+		    <span>Sổ lệnh</span>
 		  </a>
 
-		  <a class="item item-icon-left" href="#">
+		  <a class="item item-icon-left">
 		    <i class="icon ion-android-notifications"></i>
-		    Thông báo
+		    <span>Thông báo</span>
 		  </a>
 
 		  <div class="item item-divider" ng-bind="'TRỢ GIÚP'"></div>
-		  <a class="item item-icon-left" href="#">
+		  <a class="item item-icon-left">
 		    <i class="icon ion-ios-telephone"></i>
-		    Gọi cho dịch vụ khách hàng
+		    <span>Gọi cho dịch vụ khách hàng</span>
 		  </a>
-		  <a class="item item-icon-left" href="#">
+		  <a class="item item-icon-left">
 		    <i class="icon ion-ios-chatbubble"></i>
-		    Góp ý
+		    <span>Góp ý</span>
 		  </a>
 		</div>
 	</ion-content>

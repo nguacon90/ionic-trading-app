@@ -4,6 +4,18 @@ ion-view {
 	color: #e5e5e5;
 	font-size: 13px;
 }
+.appPage .list, .appPage .input-label{
+	font-size: 13px;
+}
+.left {
+	float: left;
+}
+.right {
+	float: right;
+}
+ion-header-bar .title {
+	text-transform: uppercase;
+}
 .bar-trading-app .bar-header {
 	background-color: #f39000;
 }
@@ -12,8 +24,8 @@ ion-view {
 	color: #F8F8F8;
 }
 
-.account-info .bar-subheader .bar-light {
-	background-color: rgba(100, 100, 100, 0.7);
+.appPage .bar-light {
+	background-color: rgba(80, 80, 80, 1);
     border-radius: 4px;
     vertical-align: middle;
     color: #e5e5e5;
@@ -21,12 +33,12 @@ ion-view {
     line-height: 22px;
     background-image: none;
     position: relative;
-    top: 25px;
     padding: 5px 10px;
+    top:25px;
 }
 .bar-subheader .row.header {
 	position: relative;
-	top: 25px;
+	top:25px;
 
 }
 .account-info .has-subheader {
@@ -34,7 +46,7 @@ ion-view {
 	overflow: auto;
 }
 .asset .has-subheader {
-	margin-top: 65px;
+	margin-top: 35px;
 }
 .back-button {
 	color: #F8F8F8 !important;
@@ -109,7 +121,7 @@ ion-view {
 	color: #f39000;
 }
 
-.account-info .profit {
+.profit {
 	width: 100%;
 }
 
@@ -118,7 +130,7 @@ ion-view {
 }
 
 .asset .bar-subheader {
-	height: 160px;
+	height: 130px;
 }
 
 .account-info .tabs-top.tabs-striped {
@@ -129,11 +141,11 @@ ion-view {
 	border-bottom: 1px solid #cecece;
     margin-bottom: 10px;
     font-weight: bold;
-    padding: 5px 15px;
+    padding: 5px;
 
 }
 
-.account-info .account-number {
+.account-number {
 	width: 100%;
 	text-align: right;
 }
@@ -148,16 +160,50 @@ ion-view {
 .row {
 	margin-top: 0px !important;
 }
-
 .menu-trading .item {
 	padding-top: 10px;
 	padding-bottom: 10px;
-	width: 100%; 
-	background-color: rgba(100, 100, 100, 0.5);
+}
+.menu-trading a span {
 	border: none;
-	font-size: 13px;
+    border-bottom: 1px solid;
+    width: 100%;
+    line-height: 25px;
+    padding-bottom: 6px;
+    display: block;
+    border-color: #444;
 }
 
+.trading .item {
+	border-bottom: 1px solid !important;
+}
+
+.menu-trading .item, .trading .item {
+	
+	width: 100%; 
+	background-color: transparent;
+	border: none;
+	font-size: 13px;
+    vertical-align: middle;
+    height: 45px;
+}
+
+div.row.item.item-input:first-child {
+	border-bottom: none !important;
+}
+
+.span-touch {
+	display: inline-block;
+    position: relative;
+    padding: 10px;
+}
+.stock-info {
+	border-bottom: 1px solid;
+	color: #444;
+}
+.trading .row .col {
+	color: #A2A2A2;
+}
 .menu-trading .item-divider {
 	background-color: rgba(0, 0, 0, 0.2);
 	color: #f39000;
@@ -289,4 +335,112 @@ ion-view {
 .item.item-divider {
 	color: #f39000;
 	font-weight: bold;
+}
+
+.trading input{
+	color: #e5e5e5;
+	max-width: 72px;
+	display: inline-block;
+	padding: 0 10px;
+    text-align: center;
+    height: 25px;
+    margin-top: -25px;
+}
+
+.trading .input-label {
+	margin-right: 50px;
+	color: #e5e5e5;
+}
+
+.trading .list {
+	background-color: rgba(58, 58, 58, 0.3);
+	width: 110%;
+    margin-left: -10px;
+    padding: 0 2em 0 1em;
+}
+
+.trading .bar-light {
+	top: 0;
+	margin-bottom: 10px;
+}
+.trading .row .col {
+	padding: 8px 0;
+}
+.trading .slider {
+	display: inline-block;
+    vertical-align: top;
+    width: 40px;
+    margin: 7px 14px 0 19px;
+}
+.margin33 {
+	margin-left: 33px;
+}
+.trading .btn-group {
+	margin: 10px auto;
+	display: block;
+	width: 215px;
+}
+
+.highlight {
+    box-shadow: 0px 0px 17px 7px #ffffff;
+    background-color: #fff;
+    color: #fff;
+}
+
+.trading .btn-group .button {
+	min-height: 10px;
+    line-height: 35px;
+    min-width: 215px;
+}
+.trading .item-note {
+	width: 125px;
+	margin-top: 7px;
+}
+.trading select {
+	background: none;
+    border: none;
+    color: #eee;
+    width: 73px;
+    text-indent: 20px;
+    margin-top: 10px;
+    vertical-align: top;
+}
+.trading .item-note .arrow-circle:BEFORE{
+	font-weight: bold;
+	vertical-align: top;
+    margin-top: 1px;
+}
+
+ion-view.trading {
+	background: url(../img/backgroundTrading.png) no-repeat;
+	background-size: 100%;
+}
+.icon-sell {
+	background: url('../img/iconSell.png') no-repeat;
+}
+
+.icon-buy {
+	background: url('../img/IconBuy.png') no-repeat;
+   
+}
+
+.icon-trading {
+	display: inline-block;
+    height: 16px;
+    width: 32px;
+    background-size: 100%;
+    top: 4px;
+    position: relative;
+    margin-right: 5px;
+}
+
+.arrow-circle {
+	display: inline-block;
+    color: #f8f8f8;
+    font-size: 10px;
+    border: 1px solid #f8f8f8;
+    border-radius: 15px;
+    height: 15px;
+    width: 15px;
+    text-align: center;
 }

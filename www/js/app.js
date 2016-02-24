@@ -5,7 +5,8 @@
 // the 2nd parameter is an array of 'requires'
 // 'starter.services' is found in services.js
 // 'starter.controllers' is found in controllers.js
-angular.module('tradingApp', ['ionic', 'tradingApp.controllers', 'tradingApp.services', 'tradingApp.filters', 'ngCookies'])
+angular.module('tradingApp', ['ionic', 'tradingApp.controllers', 'tradingApp.services', 
+  'tradingApp.filters', 'ngCookies'])
 
 .run(function($ionicPlatform) {
   $ionicPlatform.ready(function() {
@@ -57,7 +58,7 @@ angular.module('tradingApp', ['ionic', 'tradingApp.controllers', 'tradingApp.ser
         controller: 'AccountCtrl'
       }
     }
-  })  
+  }) 
 
   .state('tab.trading', {
       url: '/trading',
@@ -68,6 +69,15 @@ angular.module('tradingApp', ['ionic', 'tradingApp.controllers', 'tradingApp.ser
         }
       }
     })
+  .state('tab.trading-account-list', {
+    url: 'trading/account/list',
+    views: {
+      'tab-trading': {
+        templateUrl: 'templates/account-list.html',
+        controller: 'TradingCtrl'
+      }
+    }
+  }) 
 
   .state('tab.menu', {
     url: '/menu',

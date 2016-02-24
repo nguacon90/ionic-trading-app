@@ -1,24 +1,29 @@
 angular.module('tradingApp.controllers', [])
 .controller('TradingAppCtrl', function($rootScope, $scope, $cookies, $ionicPopup, $ionicLoading, 
-      $state, $ionicTabsDelegate, tradingService, tradeApiErrorParser) {
+      $state, $ionicTabsDelegate, $ionicGesture, tradingService, tradeApiErrorParser) {
   $scope.tabs = {
     accountIndex: 0,
-    assetIndex: 1
+    tradingIndex: 1
   };
+  $scope.tabInfo = {};
+  $scope.topMenu = {
+    accountPage: {
+       portfolio: 'portfolio',
+       asset: 'asset'
+    },
+    tradingPage: {
+      placeorder: 'placeorder',
+      orderbook: 'orderbook'
+    }
+  };
+  $scope.tabInfo.selectedTab = $scope.topMenu.accountPage.portfolio;
 
-  function getState(tabIndex) {
+  $scope.getState = function(tabIndex) {
     switch(tabIndex) {
       case 0:
         return 'tab.account'
       case 1:
-        return 'tab.asset' 
-    }
-  };
-
-  $scope.topMenu = {
-    accountInfo: {
-       portfolio: 'portfolio',
-       asset: 'asset'
+        return 'tab.trading' 
     }
   };
 
@@ -117,6 +122,28 @@ angular.module('tradingApp.controllers', [])
        
      });
   };
+
+  $scope.showAccountList = function(state) {
+    $state.go(state);
+  };
+
+  $scope.handleTabEvent = function(element) {
+    $ionicGesture.on('tap', function(e){
+        $scope.$applyAsync(function() {
+          $scope.tabInfo.selectedTab = e.target.id;
+          switch($scope.tabInfo.selectedTab) {
+            case $scope.topMenu.accountPage.portfolio: 
+              $scope.loadPortfolio();
+              return;
+            case $scope.topMenu.accountPage.asset: 
+              $scope.loadAssets();
+              $scope.loadStocks();
+              $scope.loadPP0();
+              return;
+          }
+        });    
+    }, element);
+  };
  
   $scope.showLogin = function() {
     var loginPopup = $ionicPopup.show({
@@ -151,7 +178,8 @@ angular.module('tradingApp.controllers', [])
         $scope.hideLoading();  
         $cookies.put('accessToken', response.data.token);
         $scope.loadAll();
-        $state.go(getState($ionicTabsDelegate.selectedIndex()));
+        $state.go($scope.getState($scope.tabs.accountIndex));
+        $scope.tabInfo.selectedTab = $scope.topMenu.accountPage.portfolio;
       }, function(jqXHR){
         $scope.hideLoading();  
         var errorMessage = tradeApiErrorParser.getMessage(jqXHR.data);
@@ -184,66 +212,84 @@ angular.module('tradingApp.controllers', [])
 
 })
 .controller('AccountCtrl', function($scope, $state, $ionicGesture) {
-  
     $scope.loadAll();
-    $scope.tabInfo = {
-      selectedTab : $scope.topMenu.accountInfo.portfolio
-    };
-
-    var portfolioElm = angular.element(document.querySelector('#portfolio')); 
-    handleTabEvent(portfolioElm);
-
-    var assetElm = angular.element(document.querySelector('#asset')); 
-    handleTabEvent(assetElm);
-
-    $scope.showAccountList = function() {
-      $state.go('tab.account-list');
-    };
+    // $scope.tabInfo.selectedTab = $scope.topMenu.accountPage.portfolio;
+    $scope.handleTabEvent(angular.element(document.querySelector('#portfolio')));
+    $scope.handleTabEvent(angular.element(document.querySelector('#asset')));
 
     $scope.loadAccountInfo = function() {
       $scope.loadPortfolio();
       $scope.loadPP0();
       $scope.loadAssets();
       $scope.loadStocks();
-      $state.go('tab.account');
-    };
-
-
-    function handleTabEvent(element) {
-      $ionicGesture.on('tap', function(e){
-          $scope.$applyAsync(function() {
-            $scope.tabInfo.selectedTab = e.target.id;
-            switch($scope.tabInfo.selectedTab) {
-              case $scope.topMenu.accountInfo.portfolio: 
-                 $scope.loadPortfolio();
-                 return;
-              case $scope.topMenu.accountInfo.asset: 
-                $scope.loadAssets();
-                $scope.loadStocks();
-                $scope.loadPP0();
-                return;
-            }
-          });    
-      }, element);
+      $state.go($scope.getState($scope.tabs.accountIndex));
     };
 })
 
-.controller('TabCtrl', function($scope, $ionicPopup, $log, tradingService, $cookies, $ionicTabsDelegate) {
+.controller('TabCtrl', function($scope, $ionicPopup, $log, tradingService, $cookies, $state, $ionicTabsDelegate) {
   $scope.loadData = function(obj) {
     var token = $cookies.get('accessToken');
     if(token && token != '') {
-      var selectedTabIndex = $ionicTabsDelegate.selectedIndex();
-      if(selectedTabIndex == $scope.tabs.accountIndex) {
-        $scope.loadAll(); 
+      if(obj == $scope.tabs.accountIndex) {
+        var element = document.getElementById($scope.topMenu.accountPage.portfolio);
+        ionic.trigger('tap', {target: element}, false, false);
+        $state.go($scope.getState(obj));
+      } else if(obj == $scope.tabs.tradingIndex) {
+        $scope.tabInfo.selectedTab = $scope.topMenu.tradingPage.placeorder;
+        $state.go($scope.getState(obj));
       }
-      return true;
     }
   };
   
 })
 
-.controller('TradingCtrl', function($scope) {
+.controller('TradingCtrl', function($scope, $state, $ionicSlideBoxDelegate) {
+  $scope.handleTabEvent(angular.element(document.querySelector('#placeorder'))); 
+  $scope.handleTabEvent(angular.element(document.querySelector('#orderbook')));
+
+  $scope.order = {
+    quantity: 0,
+    price: 0,
+    sign: 'NB',
+    orderType: 'LO'
+  };
+  $scope.sign = {
+    active: 0,
+    mapSign: {
+      0: 'NS',
+      1: 'NB'
+    }
+  };
   
+  $scope.highlight = function(event) {
+    var element = angular.element(event.gesture.target);
+    element.addClass('highlight');
+    setTimeout(function(){
+      element.removeClass('highlight');
+    }, 200);
+  };
+
+  $scope.slideSigns = function (index) {
+    var signKey = index % 2;
+
+  };
+
+  $scope.changeSignActive = function(sign) {
+    if(sign > 0) {
+      $scope.sign.active++;
+      $scope.sign.active = $scope.sign.active > 3 ? 0 : $scope.sign.active;
+    } else {
+      $scope.sign.active--;
+      $scope.sign.active = $scope.sign.active < 0 ? (2 - $scope.sign.active) : $scope.sign.active;
+    }
+    
+    $ionicSlideBoxDelegate.slide($scope.sign.active);
+  };
+
+  $scope.loadAccountInfo = function() {
+    $scope.loadPP0();
+    $state.go($scope.getState($scope.tabs.tradingIndex));
+  };
 })
 
 .controller('MenuCtrl', function($rootScope, $scope, $cookies, $state, $ionicTabsDelegate) {
@@ -256,9 +302,10 @@ angular.module('tradingApp.controllers', [])
     };
 
     $scope.goto = function(tabId) {
-        if(tabId == $scope.topMenu.accountInfo.portfolio ||
-          tabId == $scope.topMenu.accountInfo.asset) {
-          $state.go('tab.account');
+        if(tabId == $scope.topMenu.accountPage.portfolio ||
+          tabId == $scope.topMenu.accountPage.asset) {
+          var accountState = $scope.getState($scope.tabs.accountIndex);
+          $state.go(accountState);
           var element = document.getElementById(tabId);
           ionic.trigger('tap', {target: element}, false, false);
         }
