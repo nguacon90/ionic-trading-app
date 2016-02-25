@@ -196,6 +196,7 @@ div.row.item.item-input:first-child {
 	display: inline-block;
     position: relative;
     padding: 10px;
+    border-radius: 20px;
 }
 .stock-info {
 	border-bottom: 1px solid;
