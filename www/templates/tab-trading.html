@@ -1,4 +1,4 @@
-<ion-view view-title="Giao dịch" class="trading">
+<ion-view view-title="Giao dịch" class="trading" ng-init="initAutocomplete();">
 	<ion-header class="bar-positive bar-subheader">
   		<div class="tabs-striped tabs-top tabs-background-dark tabs-color-energized">
 		  	<div class="tabs">
@@ -12,9 +12,15 @@
 		</div>
   	</ion-header>
   	<ion-content class="padding has-subheader">
+  		<div class="vtos-login" ng-if="!hadLoginedVTOS();">
+  			<p>Trước khi đặt lệnh, bạn cần xác nhận VTOS</p>
+  			<button class="button button-energized btn-vtos" on-touch="showVtosLogin()">
+  				<i class="ion-ios-locked"></i> Xác nhận mã thẻ VTOS
+  			</button>
+  		</div>
 		<div class="bar bar-light">
 		      <div class="profit">
-		      	Sức mua: {{customerInfo.pp0 | number: 0}} đ
+		      	Sức mua: {{customerInfo.purchasePower | number: 0}} đ
 		      </div>
 		      <div class="account-number" on-touch="showAccountList('tab.trading-account-list')">Tài khoản: <span ng-bind="customerInfo.activeAccount"></span> <i class="ion-chevron-right"> </i>
 		      </div>
@@ -25,28 +31,28 @@
 			    <div class="input-label">Mã chứng khoán </div>
 
 			    <div class="item-note">
-				    <span class="span-touch">	
-				    	<i class="ion-ios-arrow-left arrow-circle left" on-touch="highlight($event);"></i>
+				    <span class="span-touch" on-touch="highlight($event);">	
+				    	<i class="ion-ios-arrow-left arrow-circle left"></i>
 				    </span>
-				    <input keyboard-attach type="text" ng-model="order.symbol" class="ion-autocomplete margin33" autocomplete="off">
-				    <span class="span-touch">	
-				    	<i class="ion-ios-arrow-right arrow-circle right" on-touch="highlight($event);"></i>
+				    <input type="text" ng-model="order.symbol" class="ion-autocomplete margin33" autocomplete="off" placeHolder="Mã CK"ng-keyup="search();" capitalize ng-blur="setFocus(false); loadStockInfo(order.symbol);" ng-focus="setFocus(true)">
+				    <span class="span-touch" on-touch="highlight($event);">	
+				    	<i class="ion-ios-arrow-right arrow-circle right"></i>
 				    </span>
 			    </div>
 		    
 	  		</div>
 		  	<div class="row stock-info">
-		    	<div class="col input-label">Trần 
-
+		    	<div class="col input-label">Trần: 
+		    		  <span class="royal slide-and-fade-up" animate-on-change="stockInfo.ceilingPrice" ng-bind-html="stockInfo.ceilingPrice|number:1| priceFilter"></span>
 			    </div>
-			    <div class="col input-label">TC 
-
+			    <div class="col input-label">TC: 
+			    	<span class="energized">{{stockInfo.basicPrice|number:1| priceFilter}}</span>
 			    </div>
-			    <div class="col input-label">Sàn
-
+			    <div class="col input-label">Sàn:
+			    	<span class="calm">{{stockInfo.floorPrice|number:1 | priceFilter}}</span>
 			    </div>
-			    <div class="col input-label">Khớp
-
+			    <div class="col input-label">Khớp:
+			    <span class="{{stockInfo|colorPrice}}">{{stockInfo.matchPrice|number:1 | priceFilter}}</span>
 			    </div>
 
 	    	</div>
@@ -54,10 +60,10 @@
 		  		<div class="input-label">Mua/Bán</div>
 
 			    <div class="item-note">
-				    <span class="span-touch" on-touch="changeSignActive(1);highlight($event);">
+				    <span class="span-touch" on-touch="changeSideActive(1);highlight($event);">
 				    	<i class="ion-ios-arrow-left arrow-circle left"></i>
 				    </span>
-				    <ion-slide-box on-slide-changed="slideSigns($index)" does-continue="true" active-slide="sign.active" class="margin33">
+				    <ion-slide-box on-slide-changed="slideSides($index)" does-continue="true" active-slide="side.active" class="margin33">
 					  <ion-slide>
 					    <div class="box balanced">MUA</div>
 					  </ion-slide>
@@ -65,21 +71,23 @@
 					    <div class="box assertive">BÁN</div>
 					  </ion-slide>
 					</ion-slide-box>
-				    <span class="span-touch" on-touch="changeSignActive(-1);highlight($event);">
+				    <span class="span-touch" on-touch="changeSideActive(-1);highlight($event);">
 				    	<i class="ion-ios-arrow-right arrow-circle right"></i>
 				    </span>
 			    </div>
 		  	</div>
 		  	<div class="row item item-input">
-		  		<div class="input-label">Khối lượng </div>
+		  		<div class="input-label quantity">Khối lượng 
+		  		<span class="item-note" ng-if="order.price != 0">(max {{customerInfo.purchasePower / (order.price * 1000) | number: 0}})</span>
+		  		</div>
 
 			    <div class="item-note">
-			    	<span class="span-touch">
-				    	<i class="arrow-circle ion-ios-minus-empty left" on-touch="highlight($event);"></i>
+			    	<span class="span-touch" on-touch="highlight($event); changeQty(false);">
+				    	<i class="arrow-circle ion-ios-minus-empty left" ></i>
 				    </span>
-				    <input type="text" ng-model="order.quantity" class="margin33" autocomplete="off">
-			    	<span class="span-touch">
-				    	<i class="arrow-circle ion-ios-plus-empty right" on-touch="highlight($event);"></i>
+				    <input type="text" ng-model="order.quantity" class="margin33" autocomplete="off" number-only>
+			    	<span class="span-touch" on-touch="highlight($event); changeQty(true)">
+				    	<i class="arrow-circle ion-ios-plus-empty right"></i>
 				    </span>
 			    </div>
 		  	</div>
@@ -87,33 +95,27 @@
 		  		<div class="input-label">Loại lệnh </div>
 
 			    <div class="item-note">
-			    	<span class="span-touch">
-				    	<i class="ion-ios-arrow-left arrow-circle left" on-touch="highlight($event);"></i>
+			    	<span class="span-touch" on-touch="highlight($event);"on-touch="highlight($event);">
+				    	<i class="ion-ios-arrow-left arrow-circle left"></i>
 				    </span>
-				    <select ng-model="order.orderType">
-				      <option value="LO">LO</option>
-				      <option value="ATO">ATO</option>
-				      <option value="ATC">ATC</option>
-				      <option value="MOK">MOK</option>
-				      <option value="MTL">MTL</option>
-				      <option value="MAK">MAK</option>
-				      <option value="MP">MP</option>
+				    <select ng-model="order.priceType">
+				      <option ng-repeat="item in priceTypes" value="{{item}}">{{item}}</option>
 				    </select>
-				    <span class="span-touch">
-				    	<i class="ion-ios-arrow-right arrow-circle right" on-touch="highlight($event);"></i>
+				    <span class="span-touch" on-touch="highlight($event);">
+				    	<i class="ion-ios-arrow-right arrow-circle right"></i>
 				    </span>
 			    </div>
 		  	</div>
 		  	<div class="row item item-input">
-		  		<div class="input-label">Giá </div>
+		  		<div class="input-label price">Giá <span class="item-note">(x1000)</span></div>
 
-			    <div class="item-note">
-			    	<span class="span-touch">
-				    	<i class="arrow-circle ion-ios-minus-empty left" on-touch="highlight($event);"></i>
+			    <div class="item-note {{order.priceType != 'LO' ? 'disabled' : ''}}">
+			    	<span class="span-touch" on-touch="order.priceType != 'LO' || highlight($event) || changePrice(-0.1)" ng-disabled="order.priceType != 'LO'">
+				    	<i class="arrow-circle ion-ios-minus-empty left"></i>
 				    </span>
-				    <input type="text" ng-model="order.price" class="margin33" autocomplete="off">
-				    <span class="span-touch">
-				    	<i class="arrow-circle ion-ios-plus-empty right" on-touch="highlight($event);"></i>
+				    <input type="text" ng-model="order.price" class="margin33" autocomplete="off" name="price" ng-disabled="order.priceType != 'LO'">
+				    <span class="span-touch" on-touch="order.priceType != 'LO' || highlight($event) || changePrice(0.1)" ng-disabled="order.priceType != 'LO'">
+				    	<i class="arrow-circle ion-ios-plus-empty right"></i>
 				    </span>
 			    </div>
 		  	</div>
@@ -123,14 +125,22 @@
         <div class="row item-input">
 	  		<div class="input-label">Tổng giá trị:  </div>
 
-		    <div class="item-note">
-			    
+		    <div class="item-note" style="color: #fff;">
+			    {{order.quantity * order.price * 1000 | number:0}} đ
 		    </div>
 	  	</div>
         <div class="btn-group">
-			<button class="button {{sign.active % 2 == 0 ? 'button-balanced' : 'button-assertive'}}"><i class="icon-trading {{sign.active % 2 == 0 ? 'icon-buy' : 'icon-sell'}}"></i>{{sign.active % 2 == 0 ? 'Đặt lệnh mua' : 'Đặt lệnh bán'}}</button>
+			<button class="button {{side.active % 2 == 0 ? 'button-balanced' : 'button-assertive'}}" on-touch="placeOrder();"><i class="icon-trading {{side.active % 2 == 0 ? 'icon-buy' : 'icon-sell'}}"></i>
+			{{side.active % 2 == 0 ? 'Đặt lệnh mua' : 'Đặt lệnh bán'}}</button>
 		</div>
 
   	</ion-content>
+
+  	<ion-footer-bar align-title="left" keyboard-attach class="" ng-class="(nativeEvents.keyboardshow && focusInput)?'' : 'hide'">
+  		<ion-scroll direction="x" class="scroll-symbols">
+	   		<div ng-repeat="stock in suggestStocks" class="suggestion" ng-click="loadStockInfo(stock.symbol);">{{stock.symbol}}</div>
+	   	</ion-scroll>
+ 	</ion-footer-bar>
+
 
 </ion-view>

@@ -1,23 +1,31 @@
 angular.module('tradingApp.services', [])
 .factory('tradingService', function($http, $q, $log){
   var loginUrl = 'https://auth-api.vndirect.com.vn/auth',
+      getVtosChallengeUrl = 'https://auth-api.vndirect.com.vn/vtos',
+      postVtosAnswerUrl = 'https://auth-api.vndirect.com.vn/vtos/auth',
       getPortfolioUrl = 'https://trade-api.vndirect.com.vn/accounts/{id}/portfolio',
       getPP0Url = 'https://trade-api.vndirect.com.vn/accounts/{id}/assets',
       accountsUrl = 'https://trade-api.vndirect.com.vn/accounts',
       getStocksUrl = 'https://trade-api.vndirect.com.vn/accounts/{id}/stocks',
+      getPpseUrl = 'https://trade-api.vndirect.com.vn/accounts/{id}/ppse',
+      postOrderUrl = 'https://trade-api.vndirect.com.vn/accounts/{id}/orders/new_order_requests',
       customerUrl = 'https://trade-api.vndirect.com.vn/customer';
   ajaxJson = function(method, url, token, data) {
+    var config = {
+        url: url,
+        method: method,
+        dataType: 'json',
+        headers: token ? {'X-AUTH-TOKEN': token} : {},
+        contentType: 'application/json'  
+    };
     if (method !== 'get') {
       data = JSON.stringify(data);
+      config['data'] = data;
+    } else {
+        config['params'] = data;
     }
-    return $http({
-      url: url,
-      data: data,
-      method: method,
-      dataType: 'json',
-      headers: token ? {'X-AUTH-TOKEN': token} : {},
-      contentType: 'application/json'
-    });
+
+    return $http(config);
   };
 
   return {
@@ -49,9 +57,53 @@ angular.module('tradingApp.services', [])
     loadStocks: function(token, accountNumber) {
         var url = getStocksUrl.replace('{id}', accountNumber);
         return ajaxJson('get', url, token);
-    }
+    },
+    getPpse: function(token, accountNumber, symbol, price, priceType) {
+        var url = getPpseUrl.replace('{id}', accountNumber);
+        return ajaxJson('get', url, token, {symbol: symbol, price: price, priceType: priceType});
+    },
+    postOrder: function(token, accountNumber, order) {
+        var url = postOrderUrl.replace('{id}', accountNumber);
+        return ajaxJson('post', url, token, order);
+    },
+    getVtosChallenge: function(token) {
+        return ajaxJson('get', getVtosChallengeUrl, token);
+    },
+
+    postVtosAnswer: function(token, codes) {
+        return ajaxJson('post', postVtosAnswerUrl, token, {
+            codes: codes.join(',')
+        });
+    },
 
   }
+})
+.service('finfoService', function($http){
+
+    loadAllStocks = function() {
+        return $http({
+          url: 'https://finfo-api.vndirect.com.vn/stocks/mini',
+          method: 'get',
+          dataType: 'json',
+          contentType: 'application/json'
+        });
+    };
+
+    getStock = function(symbol) {
+        var secInfoUrl = 'https://www.vndirect.com.vn/secinfoservice/rest/';
+        var url = secInfoUrl + 'secInfo/getSecInfo?callback=JSON_CALLBACK&code=' + symbol;
+        return $http.jsonp(url, {
+            method: 'get'
+        });
+    }
+    return {
+        getStocks: function() {
+            return loadAllStocks();
+        },
+        getStock: function(symbol) {
+            return getStock(symbol);
+        }
+    }
 })
 .service('tradeApiErrorParser', function(){
   var TRADE_API_ERROR = {

@@ -1,11 +1,17 @@
 angular.module('tradingApp.controllers', [])
 .controller('TradingAppCtrl', function($rootScope, $scope, $cookies, $ionicPopup, $ionicLoading, 
       $state, $ionicTabsDelegate, $ionicGesture, tradingService, tradeApiErrorParser) {
+  var appPage = angular.element(document.getElementById("appPage"));
   $scope.tabs = {
     accountIndex: 0,
-    tradingIndex: 1
+    marketIndex: 1,
+    tradingIndex: 2,
+    notiIndex: 3,
+    menuIndex: 4
   };
+
   $scope.tabInfo = {};
+
   $scope.topMenu = {
     accountPage: {
        portfolio: 'portfolio',
@@ -22,23 +28,39 @@ angular.module('tradingApp.controllers', [])
     switch(tabIndex) {
       case 0:
         return 'tab.account'
-      case 1:
+      case 2:
         return 'tab.trading' 
     }
   };
 
   function init() {
-    $scope.account = {};
+    $scope.account = {
+      username: 'thangnt.nhtck47',
+      password: 'vnds@1234'
+    };
     $scope.customerInfo = null;
-    $scope.targetHref = '#/tab/account';  
-  };
+    $scope.targetHref = '#/tab/account';
+    //TODO
+    var accessToken = $cookies.get('accessToken');
+    if(typeof(accessToken) !== 'undefined' && accessToken != '') {
+      appPage.addClass('had-logined');
+      $scope.loadAll();
+      return false;
+    }
 
-  init();
+    if(!appPage.hasClass('had-logined')) {
+      $scope.showLogin();
+    }
+  };
   
   $rootScope.$on('ClearData', function(){
+    appPage.removeClass('had-logined');
     init();
-    $scope.loadAll();
   });
+
+  $scope.hadLoginedVTOS = function() {
+    return appPage.hasClass('had-logined-vtos');
+  };
 
   $scope.loadAll = function() {
     if($scope.customerInfo) {
@@ -80,11 +102,12 @@ angular.module('tradingApp.controllers', [])
        var accounts = response.data.accounts;
        angular.forEach(accounts, function(account, index) {
           if(accountNumber === account.accountNumber) {
-            $scope.customerInfo.pp0 = account.purchasePower;
+            $scope.customerInfo.purchasePower = account.purchasePower;
             return;
           }
        });
        
+       $scope.$broadcast('ACCOUNT_CHANGE');
      });
     
   };
@@ -149,7 +172,6 @@ angular.module('tradingApp.controllers', [])
     var loginPopup = $ionicPopup.show({
       templateUrl: 'templates/login-form.html',
       title: '',
-      subTitle: '<i class="ion-close"></i>',
       cssClass: 'loginPage',
       scope: $scope,
       buttons: [
@@ -180,12 +202,61 @@ angular.module('tradingApp.controllers', [])
         $scope.loadAll();
         $state.go($scope.getState($scope.tabs.accountIndex));
         $scope.tabInfo.selectedTab = $scope.topMenu.accountPage.portfolio;
+        appPage.addClass('had-logined');
       }, function(jqXHR){
         $scope.hideLoading();  
         var errorMessage = tradeApiErrorParser.getMessage(jqXHR.data);
         showError(errorMessage);
       });
     };
+  };
+  var vtosloginPopup;
+  $scope.vtos = [];
+  $scope.showVtosLogin = function() {
+    loadChallenge();
+    vtosloginPopup = $ionicPopup.show({
+      templateUrl: 'templates/vtos-login-form.html',
+      title: '',
+      cssClass: 'loginPage vtosLoginPage',
+      scope: $scope
+    });
+  };
+
+  $scope.loginVtos = function() {
+    $scope.showLoading(); 
+    var token = $cookies.get('accessToken');
+    tradingService.postVtosAnswer(token, $scope.vtos).then(function(response){
+      $scope.hideLoading(); 
+
+      $cookies.put('accessToken', response.data.token);
+      appPage.addClass('had-logined-vtos');
+      vtosloginPopup.close(); 
+
+    }, function(jqXHR){
+      loadChallenge();
+      $scope.hideLoading();  
+      var errorMessage = tradeApiErrorParser.getMessage(jqXHR.data);
+      showError(errorMessage);
+    });
+  };
+
+  function loadChallenge() {
+    $scope.showLoading(); 
+    var token = $cookies.get('accessToken');
+    tradingService.getVtosChallenge(token).then(function(response){
+      $scope.challenges = response.data.challenges;
+      $scope.hideLoading(); 
+    }, function(jqXHR){
+      $scope.hideLoading(); 
+      var errorMessage = tradeApiErrorParser.getMessage(jqXHR.data);
+      showError(errorMessage);
+    });
+  };
+
+  $scope.closeVtosLogin = function() {
+    if(vtosloginPopup) {
+      vtosloginPopup.close();  
+    }
   };
 
   $scope.showLoading = function() {
@@ -197,6 +268,8 @@ angular.module('tradingApp.controllers', [])
   $scope.hideLoading = function() {
     $ionicLoading.hide();
   };
+  
+  $scope.showError = showError;
 
   function showError(errorMessage) {
     var alertPopup = $ionicPopup.alert({
@@ -210,10 +283,21 @@ angular.module('tradingApp.controllers', [])
     }, 3000);
   };
 
+  $scope.showSuccess = function(message) {
+    var alertPopup = $ionicPopup.alert({
+     title: 'VNDirect',
+     template: message
+    });
+
+    setTimeout(function(){
+      alertPopup.close();
+    }, 3000);
+  };
+
+  init();
+
 })
 .controller('AccountCtrl', function($scope, $state, $ionicGesture) {
-    $scope.loadAll();
-    // $scope.tabInfo.selectedTab = $scope.topMenu.accountPage.portfolio;
     $scope.handleTabEvent(angular.element(document.querySelector('#portfolio')));
     $scope.handleTabEvent(angular.element(document.querySelector('#asset')));
 
@@ -226,7 +310,8 @@ angular.module('tradingApp.controllers', [])
     };
 })
 
-.controller('TabCtrl', function($scope, $ionicPopup, $log, tradingService, $cookies, $state, $ionicTabsDelegate) {
+.controller('TabCtrl', function($scope, $ionicPopup, $log, 
+    tradingService, $cookies, $state, $ionicTabsDelegate) {
   $scope.loadData = function(obj) {
     var token = $cookies.get('accessToken');
     if(token && token != '') {
@@ -243,23 +328,45 @@ angular.module('tradingApp.controllers', [])
   
 })
 
-.controller('TradingCtrl', function($scope, $state, $ionicSlideBoxDelegate) {
+.controller('TradingCtrl', function($scope, $state, $filter, $ionicScrollDelegate,
+                                    $cookies, $ionicSlideBoxDelegate, finfoService,
+                                    tradingService, tradeApiErrorParser) {
   $scope.handleTabEvent(angular.element(document.querySelector('#placeorder'))); 
   $scope.handleTabEvent(angular.element(document.querySelector('#orderbook')));
+  $scope.nativeEvents = {
+    keyboardshow: false
+  };
+
+ 
+  $scope.config = {
+    priceTypes: {
+      HOSE: ['LO', 'ATO', 'ATC', 'MP'],
+      HNX: ['LO', 'ATC', 'MOK', 'MAK', 'MTL'],
+      UPCOM: ['LO'],
+      ALL: ['LO', 'ATO', 'ATC', 'MOK', 'MAK', 'MTL', 'MP']
+    }
+  };
+
+  $scope.orderTypes = $scope.config.priceTypes['ALL'];
 
   $scope.order = {
     quantity: 0,
     price: 0,
-    sign: 'NB',
-    orderType: 'LO'
+    side: 'NB',
+    priceType: 'LO'
   };
-  $scope.sign = {
+
+  $scope.side = {
     active: 0,
     mapSign: {
       0: 'NS',
       1: 'NB'
     }
   };
+
+  $scope.mapExchange = {};
+
+  $scope.stockInfo = {};
   
   $scope.highlight = function(event) {
     var element = angular.element(event.gesture.target);
@@ -269,26 +376,226 @@ angular.module('tradingApp.controllers', [])
     }, 200);
   };
 
-  $scope.slideSigns = function (index) {
-    var signKey = index % 2;
-
-  };
-
-  $scope.changeSignActive = function(sign) {
-    if(sign > 0) {
-      $scope.sign.active++;
-      $scope.sign.active = $scope.sign.active > 3 ? 0 : $scope.sign.active;
+  $scope.changeSideActive = function(sign) {
+    if(sign < 0) {
+      $scope.side.active++;
+      $scope.side.active = $scope.side.active > 3 ? 0 : $scope.side.active;
     } else {
-      $scope.sign.active--;
-      $scope.sign.active = $scope.sign.active < 0 ? (2 - $scope.sign.active) : $scope.sign.active;
+      $scope.side.active--;
+      $scope.side.active = $scope.side.active < 0 ? (2 - $scope.side.active) : $scope.side.active;
     }
     
-    $ionicSlideBoxDelegate.slide($scope.sign.active);
+    $ionicSlideBoxDelegate.slide($scope.side.active);
   };
 
   $scope.loadAccountInfo = function() {
     $scope.loadPP0();
     $state.go($scope.getState($scope.tabs.tradingIndex));
+  };
+
+  finfoService.getStocks().then(function(response){
+      $scope.allStocks = response.data.data;
+      angular.forEach($scope.allStocks, function(stock, index){
+        $scope.mapExchange[stock.symbol] = stock.floor; 
+      });
+  });
+
+  $scope.initAutocomplete = function() {
+    finfoService.getStocks().then(function(response){
+      $scope.allStocks = response.data.data;
+    });
+  };
+
+  $scope.search = function() {
+    
+    var stocks = $filter('filter')($scope.allStocks, function(stock, index, array){
+      return stock.symbol.indexOf($scope.order.symbol) >= 0 && $scope.order.symbol != '';
+    });
+
+    $scope.suggestStocks = stocks;
+    $ionicScrollDelegate.scrollTop();
+  };
+
+  $scope.setFocus = function(isFocus) {
+    $scope.focusInput = isFocus;
+  };
+
+  $scope.loadStockInfo = function(symbol) {
+    $scope.order.symbol = symbol;
+    loadStock();
+  };
+
+  $scope.changeQty = function(isIncrease) {
+    if(isIncrease) {
+      $scope.order.quantity += getStepQty();
+      return;
+    } 
+    
+    if($scope.order.quantity == 0) {
+      return;
+    }
+    
+    $scope.order.quantity -= getStepQty(); 
+     
+  };
+
+  $scope.changePrice = function(unit) {
+    if(unit < 0 && $scope.order.price == 0) {
+      return;
+    }
+    if(typeof($scope.order.price) == 'string') {
+      $scope.order.price = parseFloat($scope.order.price);
+    };
+    
+    $scope.order.price = $filter('number')($scope.order.price + unit, 1).replace(/,/g, '');
+  };
+
+  $scope.placeOrder = function() {
+    var token = $cookies.get('accessToken');
+    var accountNumber = $scope.customerInfo.activeAccount;
+    var order = {
+      symbol: $scope.order.symbol,
+      side: ($scope.side.active % 2 == 0 ? 'NB': 'NS'),
+      orderType: $scope.order.priceType,
+      quantity: $scope.order.quantity,
+      price: $filter('number')($scope.order.price * 1000, 0).replace(/,/g, '')
+    };
+    $scope.showLoading();  
+    tradingService.postOrder(token, accountNumber, order).then(function(response){
+      $scope.hideLoading(); 
+      $scope.showSuccess('Đặt lệnh thành công');
+      $scope.order = {
+        quantity: 0,
+        price: 0,
+        side: 'NB',
+        priceType: 'LO'
+      };
+      $scope.stockInfo = {};
+      $scope.loadPP0();
+    }, function(jqXHR){
+      $scope.hideLoading(); 
+      if(jqXHR.data.error == 'AUTH-01') {
+        $scope.showVtosLogin();
+        return false;
+      }
+
+      var errorMessage = tradeApiErrorParser.getMessage(jqXHR.data);
+      $scope.showError(errorMessage);
+
+    });
+  };
+
+  $scope.$on('ACCOUNT_CHANGE', function(){
+    getPpse();
+  });
+
+  window.addEventListener('native.keyboardshow', function(e){
+    $scope.nativeEvents.keyboardshow = true;
+    $scope.$applyAsync();
+  });
+
+  window.addEventListener('native.keyboardhide', function(e){
+    $scope.nativeEvents.keyboardshow = false;
+    $scope.$applyAsync();
+  });
+  $scope.rotateDeg = 0;
+  $scope.index = 0;
+  $scope.rotateXFLip = 0;
+  $scope.rotateXFLop = -90;
+  $scope.translateZXFlop;
+  function loadStock() {
+    // $scope.showLoading(); 
+    //$scope.stockInfo=null; 
+    finfoService.getStock($scope.order.symbol).then(function(response){
+      $scope.stockInfo = response.data.secInfo;
+    
+      // setTimeout(function(){
+        
+      //   if($scope.index == 0) {
+      //     document.getElementById('lbPrice').style.transform = 'rotateX('+ $scope.rotateDeg + 'deg)';
+      //     $scope.index++;
+      //     $scope.rotateDeg += -90;
+      //     return;
+      //   }
+      //   console.log($scope.index);
+
+      //   if($scope.index % 2 != 0) {
+      //     $scope.rotateXFLop += 180;
+          
+
+      //     $scope.translateZXFlop = '30px';
+      //     var transformFlop = 'rotateX('+ $scope.rotateXFLop + 'deg) translateZ('+ $scope.translateZXFlop +')';
+      //     console.log("flop", $scope.rotateXFLop, $scope.translateZXFlop)
+      //     document.getElementById('lbFlop').style.transform = transformFlop;
+      //   } else {
+      //     $scope.rotateXFLip += 180;
+      //     document.getElementById('lbFlip').style.transform = 'rotateX('+ $scope.rotateXFLip + 'deg) translateZ(30px)';
+
+      //     console.log("flip", $scope.rotateXFLip, $scope.translateZXFlop)
+      //   }
+      //   console.log("cube", $scope.rotateDeg)
+      //   document.getElementById('lbPrice').style.transform = 'rotateX('+ $scope.rotateDeg + 'deg)';
+      //   $scope.index++;
+      //   $scope.rotateDeg += -90;
+        
+      //   //setTimeout(function() {
+      //     $scope.preCeilingPrice = $scope.stockInfo.ceilingPrice;
+      //     $scope.$applyAsync();
+      //   //}, 1000);
+
+      // }, 300);
+
+      
+
+      $scope.order.quantity = getStepQty();
+      $scope.order.price = $filter('number')($scope.stockInfo.matchPrice, 1);
+      loadPriceTypes();
+      getPpse();
+      // $scope.hideLoading();  
+    }, function() {
+      // $scope.hideLoading();  
+    });
+  };
+
+  function getStepQty() {
+    if($scope.stockInfo.code == null || typeof($scope.stockInfo.code) == 'undefined') {
+      return 0;
+    }
+
+    var symbol = $scope.stockInfo.code.toUpperCase();
+    var exchange = $scope.mapExchange[symbol];
+    if("HNX" == exchange || "UPCOM" == exchange) {
+      return 100;
+    } 
+
+    if("HOSE" == exchange) {
+      return 10;
+    }
+
+  };
+
+  function loadPriceTypes() {
+    if($scope.stockInfo.code == null || typeof($scope.stockInfo.code) == 'undefined') {
+      return;
+    }
+
+    var symbol = $scope.stockInfo.code.toUpperCase();
+    var exchange = $scope.mapExchange[symbol];
+    $scope.priceTypes = $scope.config.priceTypes[exchange];
+  };
+
+  function getPpse() {
+    var token = $cookies.get('accessToken');
+    var accountNumber = $scope.customerInfo.activeAccount;
+    var symbol = $scope.order.symbol;
+    var price = $scope.order.price;
+    var priceType = $scope.order.priceType;
+    if(price == 0 || typeof(symbol) == 'undefined') {
+      return;
+    }
+    tradingService.getPpse(token, accountNumber, symbol, price, priceType).then(function(response){
+      $scope.customerInfo.purchasePower = response.data.ppse;
+    });
   };
 })
 
@@ -310,8 +617,4 @@ angular.module('tradingApp.controllers', [])
           ionic.trigger('tap', {target: element}, false, false);
         }
     };
-})
-
-.controller('ChatDetailCtrl', function($scope, $stateParams, Chats) {
-  $scope.chat = Chats.get($stateParams.chatId);
 });

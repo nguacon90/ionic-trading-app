@@ -4,6 +4,23 @@ ion-view {
 	color: #e5e5e5;
 	font-size: 13px;
 }
+.tabs-striped.tabs-color-energized .tab-item {
+	color: #f8f8f8 !important;
+	font-weight: 500;
+}
+.tabs .tab-item.active {
+	color: #f39000 !important;
+	border-color: #f39000 !important;
+}
+.backdrop-loading {
+	z-index: 99;
+}
+.loading-container {
+	z-index: 9999;
+}
+.royal {
+	color: #ae1eeb;
+}
 .appPage .list, .appPage .input-label{
 	font-size: 13px;
 }
@@ -56,18 +73,31 @@ ion-header-bar .title {
 	padding: 5px 0px;
 	line-height: 5px;
 }
-
+.tab-item {
+	opacity: 1 !important;
+}
 .tab-item .icon {
 	width: 100%;
 	position: relative;
+	height: 25px;
 }
 
 .ion-ios-navicon:before {
 	background: url('../img/IconMenu.png') no-repeat;
+	width: 22px !important;
 }
 
 .ion-ios-navicon-active:before {
 	background: url('../img/IconMenuActive.png') no-repeat;
+	width: 22px !important;
+}
+
+.icon-ios-market:before {
+	background: url('../img/IconMarket.png') no-repeat;
+}
+
+.icon-ios-market-active:before {
+	background: url('../img/IconMarketActive.png') no-repeat;
 }
 
 .icon-ios-trading:before {
@@ -76,6 +106,14 @@ ion-header-bar .title {
 
 .icon-ios-trading-active:before {
 	background: url('../img/IconTradingActive.png') no-repeat;
+}
+
+.icon-ios-notification:before {
+	background: url('../img/IconNoti.png') no-repeat;
+}
+
+.icon-ios-notification-active:before {
+	background: url('../img/IconNotiActive.png') no-repeat;
 }
 
 .icon-ios-account:before {
@@ -93,8 +131,8 @@ ion-header-bar .title {
 	content:  ' ';
 	display: block;
 	margin: 0 auto;
-	height: 28px;
-	width: 32px;
+	height: 25px;
+	width: 19px;
 }
 
 .account-list .item-radio {
@@ -234,6 +272,10 @@ div.row.item.item-input:first-child {
 
 }
 
+.loginForm {
+	margin-top: -25px;
+}
+
 .loginPage .popup-head {
 	margin: auto;
 	width: 180px;
@@ -314,11 +356,53 @@ div.row.item.item-input:first-child {
 	background-color: transparent;
 	color: #f39000;
 }
-
+.loginPage .popup-body {
+	overflow: visible;
+}
 .loginPage .ion-close {
-	position: absolute; 
-	top: 8px; 
-	right: 13px;
+	position: relative;
+    top: -65px;
+    left: 255px;
+    padding: 5px;
+    z-index: 10;
+}
+
+.vtosLoginPage .button {
+	width: 200px !important;
+	margin: 10px 35px;
+}
+
+.vtosLoginPage .ion-ios-checkmark-empty {
+	position: absolute;
+	font-size: 35px;
+	top: -2px;
+	left: 45px;
+}
+.vtosLoginPage input {
+	text-align: center;
+	background-color: #ddd;
+}
+.vtosLoginPage .col-30:first-child input{
+	border-left: none;
+}
+.vtosLoginPage input {
+	border-left: 1px solid #cecece;
+	font-size: 15px;
+	border-radius: 0;
+}
+.vtosLoginPage .challenge {
+	margin-left: 35px;
+    padding: 0;
+    width: 200px;
+    text-align: center;
+}
+
+.vtosLoginPage .challenge-answer {
+	margin-left: 35px;
+    border: 1px solid #cecece;
+    padding: 0;
+    width: 200px;
+    border-radius: 5px;
 }
 
 .assets-info .item {
@@ -349,7 +433,7 @@ div.row.item.item-input:first-child {
 }
 
 .trading .input-label {
-	margin-right: 50px;
+	margin-right: 10px;
 	color: #e5e5e5;
 }
 
@@ -393,9 +477,14 @@ div.row.item.item-input:first-child {
     line-height: 35px;
     min-width: 215px;
 }
-.trading .item-note {
-	width: 125px;
-	margin-top: 7px;
+.trading .price .item-note, 
+.trading .quantity .item-note {
+	font-size: 10px;
+	float: none;
+}
+.trading .input-label {
+	max-width: 300px;
+	width: 160px;
 }
 .trading select {
 	background: none;
@@ -410,6 +499,43 @@ div.row.item.item-input:first-child {
 	font-weight: bold;
 	vertical-align: top;
     margin-top: 1px;
+}
+
+.trading ion-footer-bar {
+	background-color: rgba(80, 80, 80, 1);
+}
+
+.trading .suggestion {
+	padding: 3px 10px;
+    border: 1px solid #cecece;
+    height: 27px;
+    margin-left: 10px;
+    border-radius: 5px;
+    display: inline-block;
+    position: relative;
+    color: #f8f8f8;
+    background-color: #9D9D9D;
+}
+
+
+.trading ion-scroll.scroll-symbols {
+  overflow: scroll;
+  white-space: nowrap;
+  top: 5px;
+}
+
+.trading .stock-info span {
+	margin-left: 2px;
+}
+
+.trading input[disabled] {
+	background: none;
+	color: #aaaaaa;
+}
+
+.trading .disabled i.arrow-circle {
+	color: #aaaaaa;
+	border-color: #aaaaaa;
 }
 
 ion-view.trading {
@@ -445,3 +571,54 @@ ion-view.trading {
     width: 15px;
     text-align: center;
 }
+
+.vtos-login {
+	text-align: center;
+	margin-bottom: 15px;
+}
+
+.vtos-login button {
+	background-color: #f39000 !important;
+    margin: 0;
+    min-height: 0;
+    line-height: 25px;
+    padding: 5px 35px;
+}
+
+.slide-and-fade-up.ng-enter {
+  opacity: 0;
+  -moz-transform: translateY(100%);
+  -ms-transform: translateY(100%);
+  -webkit-transform: translateY(100%);
+  transform: translateY(100%);
+  -moz-transition: -moz-transform 1s, opacity 1s;
+  -o-transition: -o-transform 1s, opacity 1s;
+  -webkit-transition: -webkit-transform 1s, opacity 1s;
+  transition: transform 1s, opacity 1s;
+}
+.slide-and-fade-up.ng-enter.ng-enter-active {
+  opacity: 1;
+  -moz-transform: translateY(0);
+  -ms-transform: translateY(0);
+  -webkit-transform: translateY(0);
+  transform: translateY(0);
+}
+.slide-and-fade-up.ng-leave {
+  opacity: 1;
+  -moz-transform: translateY(0);
+  -ms-transform: translateY(0);
+  -webkit-transform: translateY(0);
+  transform: translateY(0);
+  -moz-transition: -moz-transform 1s, opacity 1s;
+  -o-transition: -o-transform 1s, opacity 1s;
+  -webkit-transition: -webkit-transform 1s, opacity 1s;
+  transition: transform 1s, opacity 1s;
+}
+.slide-and-fade-up.ng-leave.ng-leave-active {
+  opacity: 0;
+  -moz-transform: translateY(-100%);
+  -ms-transform: translateY(-100%);
+  -webkit-transform: translateY(-100%);
+  transform: translateY(-100%);
+}
+

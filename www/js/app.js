@@ -6,7 +6,7 @@
 // 'starter.services' is found in services.js
 // 'starter.controllers' is found in controllers.js
 angular.module('tradingApp', ['ionic', 'tradingApp.controllers', 'tradingApp.services', 
-  'tradingApp.filters', 'ngCookies'])
+  'tradingApp.filters', 'tradingApp.directives', 'ngCookies', 'ngSanitize', 'ngAnimate'])
 
 .run(function($ionicPlatform) {
   $ionicPlatform.ready(function() {
@@ -90,6 +90,6 @@ angular.module('tradingApp', ['ionic', 'tradingApp.controllers', 'tradingApp.ser
   });
 
   // if none of the above states are matched, use this as the fallback
-  $urlRouterProvider.otherwise('/tab/account');
+  $urlRouterProvider.otherwise('/tab/trading');
 
 });

@@ -15,7 +15,11 @@
     "shelljs": "^0.3.0"
   },
   "cordovaPlugins": [
-    "ionic-plugin-deploy"
+    "ionic-plugin-deploy",
+    {
+      "locator": "https://github.com/apache/cordova-plugin-whitelist.git",
+      "id": "cordova-plugin-whitelist"
+    }
   ],
   "cordovaPlatforms": [
     "android"

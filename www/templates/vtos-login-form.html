@@ -1,0 +1,17 @@
+<i class="logo"> </i>
+<i class="ion-close" on-touch="closeVtosLogin();"></i>
+<form name="loginForm" class="loginForm">
+	<p>Điền vào 3 ô dưới đây số tương ứng </br> trên thẻ VTOS của bạn</p>
+	<div class="row challenge">
+	  <div class="col col-30">{{challenges[0]}}</div>
+	  <div class="col col-30">{{challenges[1]}}</div>
+	  <div class="col col-30">{{challenges[2]}}</div>
+	</div>
+	<div class="row challenge-answer">
+	  <div class="col-30"><input type="password" maxlength="1" ng-model="vtos[0]" move-next-on-maxlength></div>
+	  <div class="col-30"><input type="password" maxlength="1" ng-model="vtos[1]" move-next-on-maxlength></div>
+	  <div class="col-30"><input type="password" maxlength="1" ng-model="vtos[2]"></div>
+	</div>
+
+	<button class="button button-default" on-touch="loginVtos()"><i class="ion-ios-checkmark-empty"></i>Xác nhận</button>
+</form>
