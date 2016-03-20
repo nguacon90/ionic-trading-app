@@ -9,7 +9,7 @@ angular.module('tradingApp.controllers', [])
     notiIndex: 3,
     menuIndex: 4
   };
-
+  $scope.allStocks = null;
   $scope.tabInfo = {};
 
   $scope.topMenu = {
@@ -35,8 +35,8 @@ angular.module('tradingApp.controllers', [])
 
   function init() {
     $scope.account = {
-      username: 'thangnt.nhtck47',
-      password: 'vnds@1234'
+      username: 'minhtq90',
+      password: 'minh90kieu'
     };
     $scope.customerInfo = null;
     $scope.targetHref = '#/tab/account';
@@ -70,6 +70,7 @@ angular.module('tradingApp.controllers', [])
     tradingService.loadCustomer(token).then(function(response){
         
         $scope.customerInfo = response.data;
+        $scope.customerInfo.orderbook = [];
         $scope.customerInfo.activeAccount = $scope.customerInfo.accounts[0].accountNumber;
         $scope.loadPortfolio();
         $scope.loadPP0();
@@ -129,6 +130,16 @@ angular.module('tradingApp.controllers', [])
      });
   };
 
+  $scope.orderPage = 1;
+  $scope.loadOrderBook = function() {
+    var token = $cookies.get('accessToken');
+    var accountNumber = $scope.customerInfo.activeAccount;
+    tradingService.loadOrderBook(token, accountNumber, $scope.orderPage).then(function(response){
+      $scope.customerInfo.orderbook = response.data.orders;  
+      $scope.$broadcast('END_LOAD_ORDERBOOK');
+    });
+  };
+
   $scope.loadStocks = function() {
     var token = $cookies.get('accessToken');
     var accountNumber = $scope.customerInfo.activeAccount;
@@ -162,6 +173,9 @@ angular.module('tradingApp.controllers', [])
               $scope.loadAssets();
               $scope.loadStocks();
               $scope.loadPP0();
+              return;
+            case $scope.topMenu.tradingPage.orderbook:
+              $scope.loadOrderBook();
               return;
           }
         });    
@@ -365,7 +379,7 @@ angular.module('tradingApp.controllers', [])
   };
 
   $scope.mapExchange = {};
-
+  $scope.stockList = [];
   $scope.stockInfo = {};
   
   $scope.highlight = function(event) {
@@ -393,16 +407,34 @@ angular.module('tradingApp.controllers', [])
     $state.go($scope.getState($scope.tabs.tradingIndex));
   };
 
-  finfoService.getStocks().then(function(response){
-      $scope.allStocks = response.data.data;
-      angular.forEach($scope.allStocks, function(stock, index){
-        $scope.mapExchange[stock.symbol] = stock.floor; 
-      });
-  });
+  
+  // console.log($scope.$parent.allStocks)
+  // if($scope.$parent.allStocks == null) {
+  //   finfoService.getStocks().then(function(response){
+  //     $scope.hideLoading();
+  //     $scope.$parent.allStocks = response.data.data;
+  //     angular.forEach($scope.allStocks, function(stock, index){
+  //       $scope.mapExchange[stock.symbol] = stock.floor; 
+  //       $scope.stockList.push(stock.symbol);
+  //       $scope.stockList = $filter('orderBy')($scope.stockList, '+');
+  //     });
+  //   }, function(){
+  //     $scope.hideLoading();
+  //   });  
+  // }
 
   $scope.initAutocomplete = function() {
+    $scope.showLoading();
     finfoService.getStocks().then(function(response){
       $scope.allStocks = response.data.data;
+      $scope.hideLoading();
+      angular.forEach($scope.allStocks, function(stock, index){
+        $scope.mapExchange[stock.symbol] = stock.floor; 
+        $scope.stockList.push(stock.symbol);
+        $scope.stockList = $filter('orderBy')($scope.stockList, '+');
+      });
+    }, function(){
+      $scope.showLoading();
     });
   };
 
@@ -450,6 +482,29 @@ angular.module('tradingApp.controllers', [])
     $scope.order.price = $filter('number')($scope.order.price + unit, 1).replace(/,/g, '');
   };
 
+  $scope.slideStock = function(unit) {
+    var index = $scope.stockList.indexOf($scope.order.symbol);
+    console.log(index)
+    if(index < 0) {
+      return;
+    }
+
+    var newIndex = index + unit;
+    
+    if(newIndex < 0 || newIndex == $scope.stockList.length) {
+      newIndex = unit < 0 ? $scope.stockList.length-1 : 0;
+    }
+
+    $scope.order.symbol = $scope.stockList[newIndex];
+
+  };
+
+  $scope.$watch('order.symbol', function(){
+    if($scope.order.symbol && $scope.order.symbol.length >= 3) {
+      loadStock();
+    }
+  });
+
   $scope.placeOrder = function() {
     var token = $cookies.get('accessToken');
     var accountNumber = $scope.customerInfo.activeAccount;
@@ -487,7 +542,48 @@ angular.module('tradingApp.controllers', [])
 
   $scope.$on('ACCOUNT_CHANGE', function(){
     getPpse();
+    $scope.loadOrderBook();
   });
+
+  $scope.$on('END_LOAD_ORDERBOOK', function() {
+    angular.forEach($scope.customerInfo.orderbook, function(order, index){
+      order.isCancellable = isCancellable(order);
+      order.isReplaceable = isReplaceable(order);
+    });
+  });
+
+  $scope.cancelOrder = function(order) {
+    if(!order.isCancellable) {
+      $scope.showError('Xin lỗi bạn không thể huỷ lệnh này.');
+      return false;
+    };
+    var token = $cookies.get('accessToken');
+    var accountNumber = $scope.customerInfo.activeAccount;
+
+    $scope.showLoading();
+    tradingService.deleteOrder(token, accountNumber, order.id).then(function(){
+      $scope.hideLoading();
+      $scope.showSuccess('Huỷ lệnh thành công');
+      $scope.loadOrderBook();
+
+    }, function(jqXHR){
+      $scope.hideLoading(); 
+      if(jqXHR.data.error == 'AUTH-01') {
+        $scope.showVtosLogin();
+        return false;
+      }
+      var errorMessage = tradeApiErrorParser.getMessage(jqXHR.data);
+      $scope.showError(errorMessage);
+    });
+  };
+
+  $scope.showDetail = function(orderId) {
+    if($scope.activeOrderId == orderId) {
+      $scope.activeOrderId = -1;
+      return false;
+    }
+    $scope.activeOrderId = orderId;
+  };
 
   window.addEventListener('native.keyboardshow', function(e){
     $scope.nativeEvents.keyboardshow = true;
@@ -503,57 +599,24 @@ angular.module('tradingApp.controllers', [])
   $scope.rotateXFLip = 0;
   $scope.rotateXFLop = -90;
   $scope.translateZXFlop;
+
   function loadStock() {
-    // $scope.showLoading(); 
-    //$scope.stockInfo=null; 
+    if(typeof($scope.order.symbol) == 'undefined'
+      || $scope.order.symbol == '') {
+      return;
+    }
     finfoService.getStock($scope.order.symbol).then(function(response){
-      $scope.stockInfo = response.data.secInfo;
-    
-      // setTimeout(function(){
-        
-      //   if($scope.index == 0) {
-      //     document.getElementById('lbPrice').style.transform = 'rotateX('+ $scope.rotateDeg + 'deg)';
-      //     $scope.index++;
-      //     $scope.rotateDeg += -90;
-      //     return;
-      //   }
-      //   console.log($scope.index);
-
-      //   if($scope.index % 2 != 0) {
-      //     $scope.rotateXFLop += 180;
-          
-
-      //     $scope.translateZXFlop = '30px';
-      //     var transformFlop = 'rotateX('+ $scope.rotateXFLop + 'deg) translateZ('+ $scope.translateZXFlop +')';
-      //     console.log("flop", $scope.rotateXFLop, $scope.translateZXFlop)
-      //     document.getElementById('lbFlop').style.transform = transformFlop;
-      //   } else {
-      //     $scope.rotateXFLip += 180;
-      //     document.getElementById('lbFlip').style.transform = 'rotateX('+ $scope.rotateXFLip + 'deg) translateZ(30px)';
-
-      //     console.log("flip", $scope.rotateXFLip, $scope.translateZXFlop)
-      //   }
-      //   console.log("cube", $scope.rotateDeg)
-      //   document.getElementById('lbPrice').style.transform = 'rotateX('+ $scope.rotateDeg + 'deg)';
-      //   $scope.index++;
-      //   $scope.rotateDeg += -90;
-        
-      //   //setTimeout(function() {
-      //     $scope.preCeilingPrice = $scope.stockInfo.ceilingPrice;
-      //     $scope.$applyAsync();
-      //   //}, 1000);
-
-      // }, 300);
-
-      
-
+      $scope.stockInfo = response;
       $scope.order.quantity = getStepQty();
       $scope.order.price = $filter('number')($scope.stockInfo.matchPrice, 1);
+      $scope.highLightClass = 'high-light';
+      setTimeout(function(){
+        $scope.highLightClass = '';
+        $scope.$applyAsync();
+      }, 1000);
       loadPriceTypes();
       getPpse();
-      // $scope.hideLoading();  
-    }, function() {
-      // $scope.hideLoading();  
+      
     });
   };
 
@@ -597,6 +660,60 @@ angular.module('tradingApp.controllers', [])
       $scope.customerInfo.purchasePower = response.data.ppse;
     });
   };
+
+  function isCancellable(order) {
+      switch (order.status) {
+          case 'PendingNew':
+              return true;
+          case 'New':
+              if (['LO', 'ATO', 'ATC'].indexOf(order.orderType) >= 0) {
+                  return true;
+              }
+              break;
+          case 'PartiallyFilled':
+              if (['LO', 'MP', 'MTL'].indexOf(order.orderType) >= 0) {
+                  return true;
+              }
+              break;
+          default:
+              break;
+      }
+      return false;
+  };
+
+  function isReplaceable(order) {
+      if (!isHNX(order.symbol) && !isUPCOM(order.symbol)) {
+          return false;
+      }
+
+      switch (order.status) {
+          case 'PendingNew':
+              if (order.orderType === 'LO') {
+                  return true;
+              }
+              break;
+          case 'New':
+              if (order.orderType === 'LO') {
+                  return true;
+              }
+              break;
+          case 'PartiallyFilled':
+              if (['LO', 'MTL'].indexOf(order.orderType) >= 0) {
+                  return true;
+              }
+              break;
+          default:
+              break;
+      }
+      return false;
+  };
+  function isHNX (symbol) {
+    return 'HNX' == $scope.mapExchange[symbol];
+  };
+
+  function isUPCOM (symbol) {
+    return 'UPCOM' == $scope.mapExchange[symbol];
+  };
 })
 
 .controller('MenuCtrl', function($rootScope, $scope, $cookies, $state, $ionicTabsDelegate) {
@@ -616,5 +733,19 @@ angular.module('tradingApp.controllers', [])
           var element = document.getElementById(tabId);
           ionic.trigger('tap', {target: element}, false, false);
         }
+
+        if(tabId == $scope.topMenu.tradingPage.placeorder ||
+          tabId == $scope.topMenu.tradingPage.orderbook) {
+          var accountState = $scope.getState($scope.tabs.tradingIndex);
+          $state.go(accountState);
+          var element = document.getElementById(tabId);
+          ionic.trigger('tap', {target: element}, false, false);
+        }
     };
+})
+.controller('MarketInfoCtrl', function($scope){
+
+})
+.controller('NotificationCtrl', function($scope){
+
 });

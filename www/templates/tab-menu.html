@@ -45,12 +45,12 @@
 		  
 
 		  <div class="item item-divider" ng-bind="'GIAO DỊCH'"></div>
-		  <a class="item item-icon-left">
+		  <a class="item item-icon-left" on-touch="goto('{{topMenu.tradingPage.placeorder}}')">
 		    <i class="icon icon-trading-small"></i>
 		    <span>Đặt lệnh</span>
 		  </a>
 
-		  <a class="item item-icon-left" >
+		  <a class="item item-icon-left" on-touch="goto('{{topMenu.tradingPage.orderbook}}')">
 		    <i class="icon ion-clipboard"></i>
 		    <span>Sổ lệnh</span>
 		  </a>

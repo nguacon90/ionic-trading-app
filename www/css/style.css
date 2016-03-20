@@ -4,6 +4,9 @@ ion-view {
 	color: #e5e5e5;
 	font-size: 13px;
 }
+.background-chart {
+	background: url("../img/background.png") no-repeat scroll 0 0 / 100% 100% !important;
+}
 .tabs-striped.tabs-color-energized .tab-item {
 	color: #f8f8f8 !important;
 	font-weight: 500;
@@ -175,12 +178,18 @@ ion-header-bar .title {
 	height: 95px;
 }
 
-.account-info .bar-subheader .row.header, .assets-info .row.header {
+.account-info .bar-subheader .row.header, 
+.assets-info .row.header,
+.orderbook .row.header {
 	border-bottom: 1px solid #cecece;
     margin-bottom: 10px;
     font-weight: bold;
     padding: 5px;
 
+}
+
+.orderbook .white-color {
+	color: #fff !important;
 }
 
 .account-number {
@@ -240,7 +249,7 @@ div.row.item.item-input:first-child {
 	border-bottom: 1px solid;
 	color: #444;
 }
-.trading .row .col {
+.trading .row.header .col {
 	color: #A2A2A2;
 }
 .menu-trading .item-divider {
@@ -585,6 +594,17 @@ ion-view.trading {
     padding: 5px 35px;
 }
 
+.transition-bg-color {
+	-webkit-transition: background 0.5s linear;
+    -moz-transition: background 0.5s linear;
+    -ms-transition: background 0.5s linear;
+    -o-transition: background 0.5s linear;
+    transition: background 0.5s linear;
+}
+
+.high-light {
+	background-color: #a74400 !important;
+}
 .slide-and-fade-up.ng-enter {
   opacity: 0;
   -moz-transform: translateY(100%);
@@ -622,3 +642,53 @@ ion-view.trading {
   transform: translateY(-100%);
 }
 
+.detail-order .col {
+	text-align: right;
+}
+.txt-center {
+	text-align: center !important;
+}
+.txt-left {
+	text-align: left !important;
+}
+.detail-order .button {
+	min-height: 0;
+    min-width: 0;
+    padding: 3px;
+    margin: 0;
+    line-height: 16px;
+    font-size: 12px;
+    vertical-align: middle;
+}
+.detail-order i {
+	margin-right: 5px;
+}
+
+.detail-order .row, .detail-order .col {
+	padding: 0;
+}
+.col-15 {
+	width: 15% !important;
+}
+
+.col-35 {
+	width: 35% !important;
+}
+
+.animate-show {
+	transition: 0.6s linear all;
+	-webkit-transition: 0.6s linear all;
+	-moz-transition: 0.6s linear all;
+}
+
+.animate-show.ng-hide {
+	height: 0;
+	opacity: 0;
+}
+.orderbook {
+	font-size: 12px;
+}
+
+.orderbook .ng-hide-add, .orderbook .ng-hide-remove {
+    display: block !important;
+}

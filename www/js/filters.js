@@ -54,4 +54,60 @@ angular.module('tradingApp.filters', [])
 
 		return price;
 	}
+})
+.filter('sideFilter', function() {
+	return function(side) {
+		switch(side) {
+			case 'NB':
+			  	return 'Mua';
+			case 'NS':
+			 	return 'Bán';
+			default:
+			 	return '';
+		}
+	}
+})
+.filter('sideColor', function(){
+	return function(side) {
+		switch(side) {
+			case 'NB':
+			  	return 'balanced';
+			case 'NS':
+			 	return 'assertive';
+			default:
+			 	return '';
+		}
+	}
+})
+.filter('statusFilter', function() {
+	return function(status) {
+		switch(status) {
+			case 'PendingNew':
+				return 'Chờ xử lý';
+			case 'New':
+				return 'Đã lên sàn';
+			case 'PartiallyFilled':
+				return 'Khớp một phần';
+			case 'Filled':
+				return 'Khớp toàn bộ';
+			case 'PendingReplace':
+				return 'Đang gửi lệnh sửa';
+			case 'Replaced':
+				return 'Sửa thành công';
+			case 'PendingCancel':
+				return 'Đang gửi lệnh huỷ';
+			case 'Cancelled':
+				return 'Huỷ thành công';
+			case 'Canceled':
+				return 'Huỷ thành công';
+			case 'Rejected':
+				return 'Sàn từ chối';
+			case 'DoneForDay':
+				return 'Giải toả vì hết phiên';
+			case 'Expired':
+				return 'Hết hạn';
+			case 'Completed':
+				return '';
+		}
+	}
 });

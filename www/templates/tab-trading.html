@@ -1,4 +1,4 @@
-<ion-view view-title="Giao dịch" class="trading" ng-init="initAutocomplete();">
+<ion-view view-title="Giao dịch" class="trading {{tabInfo.selectedTab == 'orderbook' ? 'background-chart' : ''}}" ng-init="initAutocomplete();">
 	<ion-header class="bar-positive bar-subheader">
   		<div class="tabs-striped tabs-top tabs-background-dark tabs-color-energized">
 		  	<div class="tabs">
@@ -12,7 +12,7 @@
 		</div>
   	</ion-header>
   	<ion-content class="padding has-subheader">
-  		<div class="vtos-login" ng-if="!hadLoginedVTOS();">
+  		<div class="vtos-login" ng-if="!hadLoginedVTOS();" ng-show="tabInfo.selectedTab == 'placeorder'">
   			<p>Trước khi đặt lệnh, bạn cần xác nhận VTOS</p>
   			<button class="button button-energized btn-vtos" on-touch="showVtosLogin()">
   				<i class="ion-ios-locked"></i> Xác nhận mã thẻ VTOS
@@ -24,119 +24,177 @@
 		      </div>
 		      <div class="account-number" on-touch="showAccountList('tab.trading-account-list')">Tài khoản: <span ng-bind="customerInfo.activeAccount"></span> <i class="ion-chevron-right"> </i>
 		      </div>
-		    </div>
-	    </div>
-	    <div class="list">
-		  	<div class="row item item-input">
-			    <div class="input-label">Mã chứng khoán </div>
-
-			    <div class="item-note">
-				    <span class="span-touch" on-touch="highlight($event);">	
-				    	<i class="ion-ios-arrow-left arrow-circle left"></i>
-				    </span>
-				    <input type="text" ng-model="order.symbol" class="ion-autocomplete margin33" autocomplete="off" placeHolder="Mã CK"ng-keyup="search();" capitalize ng-blur="setFocus(false); loadStockInfo(order.symbol);" ng-focus="setFocus(true)">
-				    <span class="span-touch" on-touch="highlight($event);">	
-				    	<i class="ion-ios-arrow-right arrow-circle right"></i>
-				    </span>
-			    </div>
-		    
-	  		</div>
-		  	<div class="row stock-info">
-		    	<div class="col input-label">Trần: 
-		    		  <span class="royal slide-and-fade-up" animate-on-change="stockInfo.ceilingPrice" ng-bind-html="stockInfo.ceilingPrice|number:1| priceFilter"></span>
-			    </div>
-			    <div class="col input-label">TC: 
-			    	<span class="energized">{{stockInfo.basicPrice|number:1| priceFilter}}</span>
-			    </div>
-			    <div class="col input-label">Sàn:
-			    	<span class="calm">{{stockInfo.floorPrice|number:1 | priceFilter}}</span>
-			    </div>
-			    <div class="col input-label">Khớp:
-			    <span class="{{stockInfo|colorPrice}}">{{stockInfo.matchPrice|number:1 | priceFilter}}</span>
-			    </div>
-
-	    	</div>
-		  	<div class="row item item-input">
-		  		<div class="input-label">Mua/Bán</div>
-
-			    <div class="item-note">
-				    <span class="span-touch" on-touch="changeSideActive(1);highlight($event);">
-				    	<i class="ion-ios-arrow-left arrow-circle left"></i>
-				    </span>
-				    <ion-slide-box on-slide-changed="slideSides($index)" does-continue="true" active-slide="side.active" class="margin33">
-					  <ion-slide>
-					    <div class="box balanced">MUA</div>
-					  </ion-slide>
-					  <ion-slide>
-					    <div class="box assertive">BÁN</div>
-					  </ion-slide>
-					</ion-slide-box>
-				    <span class="span-touch" on-touch="changeSideActive(-1);highlight($event);">
-				    	<i class="ion-ios-arrow-right arrow-circle right"></i>
-				    </span>
-			    </div>
-		  	</div>
-		  	<div class="row item item-input">
-		  		<div class="input-label quantity">Khối lượng 
-		  		<span class="item-note" ng-if="order.price != 0">(max {{customerInfo.purchasePower / (order.price * 1000) | number: 0}})</span>
-		  		</div>
-
-			    <div class="item-note">
-			    	<span class="span-touch" on-touch="highlight($event); changeQty(false);">
-				    	<i class="arrow-circle ion-ios-minus-empty left" ></i>
-				    </span>
-				    <input type="text" ng-model="order.quantity" class="margin33" autocomplete="off" number-only>
-			    	<span class="span-touch" on-touch="highlight($event); changeQty(true)">
-				    	<i class="arrow-circle ion-ios-plus-empty right"></i>
-				    </span>
-			    </div>
-		  	</div>
-		  	<div class="row item item-input">
-		  		<div class="input-label">Loại lệnh </div>
-
-			    <div class="item-note">
-			    	<span class="span-touch" on-touch="highlight($event);"on-touch="highlight($event);">
-				    	<i class="ion-ios-arrow-left arrow-circle left"></i>
-				    </span>
-				    <select ng-model="order.priceType">
-				      <option ng-repeat="item in priceTypes" value="{{item}}">{{item}}</option>
-				    </select>
-				    <span class="span-touch" on-touch="highlight($event);">
-				    	<i class="ion-ios-arrow-right arrow-circle right"></i>
-				    </span>
-			    </div>
-		  	</div>
-		  	<div class="row item item-input">
-		  		<div class="input-label price">Giá <span class="item-note">(x1000)</span></div>
-
-			    <div class="item-note {{order.priceType != 'LO' ? 'disabled' : ''}}">
-			    	<span class="span-touch" on-touch="order.priceType != 'LO' || highlight($event) || changePrice(-0.1)" ng-disabled="order.priceType != 'LO'">
-				    	<i class="arrow-circle ion-ios-minus-empty left"></i>
-				    </span>
-				    <input type="text" ng-model="order.price" class="margin33" autocomplete="off" name="price" ng-disabled="order.priceType != 'LO'">
-				    <span class="span-touch" on-touch="order.priceType != 'LO' || highlight($event) || changePrice(0.1)" ng-disabled="order.priceType != 'LO'">
-				    	<i class="arrow-circle ion-ios-plus-empty right"></i>
-				    </span>
-			    </div>
-		  	</div>
-			
-		  	
-        </div>
-        <div class="row item-input">
-	  		<div class="input-label">Tổng giá trị:  </div>
-
-		    <div class="item-note" style="color: #fff;">
-			    {{order.quantity * order.price * 1000 | number:0}} đ
-		    </div>
-	  	</div>
-        <div class="btn-group">
-			<button class="button {{side.active % 2 == 0 ? 'button-balanced' : 'button-assertive'}}" on-touch="placeOrder();"><i class="icon-trading {{side.active % 2 == 0 ? 'icon-buy' : 'icon-sell'}}"></i>
-			{{side.active % 2 == 0 ? 'Đặt lệnh mua' : 'Đặt lệnh bán'}}</button>
 		</div>
+		<div ng-if="tabInfo.selectedTab == 'placeorder'">    
+		    <div class="list">
+			  	<div class="row item item-input">
+				    <div class="input-label">Mã chứng khoán </div>
 
+				    <div class="item-note">
+					    <span class="span-touch" on-touch="highlight($event); slideStock(-1);">	
+					    	<i class="ion-ios-arrow-left arrow-circle left"></i>
+					    </span>
+					    <input type="text" ng-model="order.symbol" class="ion-autocomplete margin33" autocomplete="off" placeHolder="Mã CK"ng-keyup="search();" capitalize ng-blur="setFocus(false); loadStockInfo(order.symbol);" ng-focus="setFocus(true)" select-on-click>
+					    <span class="span-touch" on-touch="highlight($event); slideStock(1);">	
+					    	<i class="ion-ios-arrow-right arrow-circle right"></i>
+					    </span>
+				    </div>
+			    
+		  		</div>
+			  	<div class="row stock-info">
+			    	<div class="col input-label">Trần: 
+			    		  <span class="royal slide-and-fade-up" animate-on-change="stockInfo.ceilingPrice" ng-bind-html="stockInfo.ceilingPrice|number:1| priceFilter"></span>
+				    </div>
+				    <div class="col input-label">TC: 
+				    	<span class="energized">{{stockInfo.basicPrice|number:1| priceFilter}}</span>
+				    </div>
+				    <div class="col input-label">Sàn:
+				    	<span class="calm">{{stockInfo.floorPrice|number:1 | priceFilter}}</span>
+				    </div>
+				    <div class="col input-label">Khớp:
+				    <span class="{{stockInfo|colorPrice}} transition-bg-color {{highLightClass}}">{{stockInfo.matchPrice|number:1 | priceFilter}}</span>
+				    </div>
+
+		    	</div>
+			  	<div class="row item item-input">
+			  		<div class="input-label">Mua/Bán</div>
+
+				    <div class="item-note">
+					    <span class="span-touch" on-touch="changeSideActive(1);highlight($event);">
+					    	<i class="ion-ios-arrow-left arrow-circle left"></i>
+					    </span>
+					    <ion-slide-box on-slide-changed="slideSides($index)" does-continue="true" active-slide="side.active" class="margin33">
+						  <ion-slide>
+						    <div class="box balanced">MUA</div>
+						  </ion-slide>
+						  <ion-slide>
+						    <div class="box assertive">BÁN</div>
+						  </ion-slide>
+						</ion-slide-box>
+					    <span class="span-touch" on-touch="changeSideActive(-1);highlight($event);">
+					    	<i class="ion-ios-arrow-right arrow-circle right"></i>
+					    </span>
+				    </div>
+			  	</div>
+			  	<div class="row item item-input">
+			  		<div class="input-label quantity">Khối lượng 
+			  		<span class="item-note" ng-if="order.price != 0">(max {{customerInfo.purchasePower / (order.price * 1000) | number: 0}})</span>
+			  		</div>
+
+				    <div class="item-note">
+				    	<span class="span-touch" on-touch="highlight($event); changeQty(false);">
+					    	<i class="arrow-circle ion-ios-minus-empty left" ></i>
+					    </span>
+					    <input type="text" ng-model="order.quantity" class="margin33" autocomplete="off" number-only>
+				    	<span class="span-touch" on-touch="highlight($event); changeQty(true)">
+					    	<i class="arrow-circle ion-ios-plus-empty right"></i>
+					    </span>
+				    </div>
+			  	</div>
+			  	<div class="row item item-input">
+			  		<div class="input-label">Loại lệnh </div>
+
+				    <div class="item-note">
+				    	<span class="span-touch" on-touch="highlight($event);"on-touch="highlight($event);">
+					    	<i class="ion-ios-arrow-left arrow-circle left"></i>
+					    </span>
+					    <select ng-model="order.priceType">
+					      <option ng-repeat="item in priceTypes" value="{{item}}">{{item}}</option>
+					    </select>
+					    <span class="span-touch" on-touch="highlight($event);">
+					    	<i class="ion-ios-arrow-right arrow-circle right"></i>
+					    </span>
+				    </div>
+			  	</div>
+			  	<div class="row item item-input">
+			  		<div class="input-label price">Giá <span class="item-note">(x1000)</span></div>
+
+				    <div class="item-note {{order.priceType != 'LO' ? 'disabled' : ''}}">
+				    	<span class="span-touch" on-touch="order.priceType != 'LO' || highlight($event) || changePrice(-0.1)" ng-disabled="order.priceType != 'LO'">
+					    	<i class="arrow-circle ion-ios-minus-empty left"></i>
+					    </span>
+					    <input type="text" ng-model="order.price" class="margin33 transition-bg-color {{highLightClass}}" autocomplete="off" name="price" ng-disabled="order.priceType != 'LO'">
+					    <span class="span-touch" on-touch="order.priceType != 'LO' || highlight($event) || changePrice(0.1)" ng-disabled="order.priceType != 'LO'">
+					    	<i class="arrow-circle ion-ios-plus-empty right"></i>
+					    </span>
+				    </div>
+			  	</div>
+				
+			  	
+	        </div>
+	        <div class="row item-input">
+		  		<div class="input-label">Tổng giá trị:  </div>
+
+			    <div class="item-note" style="color: #fff;">
+				    {{order.quantity * order.price * 1000 | number:0}} đ
+			    </div>
+		  	</div>
+	        <div class="btn-group">
+				<button class="button {{side.active % 2 == 0 ? 'button-balanced' : 'button-assertive'}}" on-touch="placeOrder();"><i class="icon-trading {{side.active % 2 == 0 ? 'icon-buy' : 'icon-sell'}}"></i>
+				{{side.active % 2 == 0 ? 'Đặt lệnh mua' : 'Đặt lệnh bán'}}</button>
+			</div>
+		</div>
+		<div ng-if="tabInfo.selectedTab == 'orderbook'" class="orderbook">
+			<div class="row header">
+		      <div class="col col-15">Lệnh</div>
+		      <div class="col col-15">Mã</div>
+		      <div class="col col-20">KL</div>
+		      <div class="col col-10">Giá</div>
+		      <div class="col col-40">Trạng thái</div>
+		    </div>
+		    <div class="orderbook" ng-if="customerInfo.orderbook.length > 0" ng-repeat="order in customerInfo.orderbook">
+			    <div class="row {{($index + 1) % 2 == 0 ? 'even' : 'odd'}}" on-touch="showDetail(order.id)">
+		          	<div class="col col-15 {{order.side | sideColor}}">{{order.side | sideFilter}}</div>
+		          	<div class="col white-color col-15">{{order.symbol}}</div>
+		          	<div class="col col-20 white-color">{{order.quantity | number}}</div>
+		          	<div class="col col-10 white-color">{{order.price / 1000 | number : 1}}</div>
+		        	<div class="col col-40 white-color">{{order.status | statusFilter}}</div>
+		        	
+		        </div>
+		        <div class="detail-order animate-show" ng-show="activeOrderId == order.id">
+			        <div class="row {{($index + 1) % 2 == 0 ? 'even' : 'odd'}}"> 
+			        	
+		        		<div class="col col-20">Khớp: </div>
+		        		<div class="col col-10"></div>
+		        		<div class="col col-20 txt-left">{{order.executedQuantity | number}}</div>
+		        		<div class="col col-20 txt-left">{{order.executedPrice /1000 | number: 1}}</div>
+		        	</div>
+		        	<div class="row {{($index + 1) % 2 == 0 ? 'even' : 'odd'}}">
+		        		<div class="col col-20">Còn: </div>
+		        		<div class="col col-10"></div>
+		        		<div class="col col-20 txt-left">{{order.remainingQuantity | number}}</div>
+		        		<div class="col col-20 txt-left">{{order.price/1000 | number:1}}</div>
+		        	</div>
+		        	<div class="row {{($index + 1) % 2 == 0 ? 'even' : 'odd'}}"> 
+			   
+		        		<div class="col col-20">Trạng thái: </div>
+		        		<div class="col col-50 txt-center">{{order.status | statusFilter}}</div>
+		        	</div>
+
+		        	<div class="row {{($index + 1) % 2 == 0 ? 'even' : 'odd'}}"> 
+		        		<div class="col col-20">Đặt lúc: </div>
+		        		<div class="col col-50">{{order.createdAt | date: 'HH:mm:ss dd/MM/yyyy'}}</div>
+		        	</div>
+		        	<div class="row {{($index + 1) % 2 == 0 ? 'even' : 'odd'}}">
+		        		<div class="col col-10"></div>
+		        		<div class="col col-33 .col-offset-33">
+		        		<button class="button {{order.isReplaceable ? 'button-positive' : 'button-stable'}} "><i class="ion-edit"></i>Sửa lệnh</button>
+		        		</div>
+		        		<div class="col col-10"></div>
+		        		<div class="col col-50 txt-left">
+		        		<button class="button {{order.isCancellable ? 'button-assertive' : 'button-stable'}}" on-touch="cancelOrder(order)"><i class="ion-trash-a"></i>Huỷ lệnh</button>
+		        		</div>
+		        	</div>
+	        	</div>
+		        
+	        </div>
+	        <div class="row" ng-if="customerInfo.orderbook.length == 0">
+	        	Chưa có mã nào trong danh sách chứng khoán của tài khoản này.
+	        </div>
+		</div>
   	</ion-content>
 
-  	<ion-footer-bar align-title="left" keyboard-attach class="" ng-class="(nativeEvents.keyboardshow && focusInput)?'' : 'hide'">
+  	<ion-footer-bar align-title="left" ng-if="tabInfo.selectedTab == 'placeorder'" keyboard-attach class="" ng-class="(nativeEvents.keyboardshow && focusInput)?'' : 'hide'">
   		<ion-scroll direction="x" class="scroll-symbols">
 	   		<div ng-repeat="stock in suggestStocks" class="suggestion" ng-click="loadStockInfo(stock.symbol);">{{stock.symbol}}</div>
 	   	</ion-scroll>

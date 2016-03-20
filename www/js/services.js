@@ -7,7 +7,9 @@ angular.module('tradingApp.services', [])
       getPP0Url = 'https://trade-api.vndirect.com.vn/accounts/{id}/assets',
       accountsUrl = 'https://trade-api.vndirect.com.vn/accounts',
       getStocksUrl = 'https://trade-api.vndirect.com.vn/accounts/{id}/stocks',
+      deleteOrderUrl = 'https://trade-api.vndirect.com.vn/accounts/{id}/orders/{orderId}',
       getPpseUrl = 'https://trade-api.vndirect.com.vn/accounts/{id}/ppse',
+      getOrdersUrl = 'https://trade-api.vndirect.com.vn/accounts/{id}/orders',
       postOrderUrl = 'https://trade-api.vndirect.com.vn/accounts/{id}/orders/new_order_requests',
       customerUrl = 'https://trade-api.vndirect.com.vn/customer';
   ajaxJson = function(method, url, token, data) {
@@ -75,10 +77,87 @@ angular.module('tradingApp.services', [])
             codes: codes.join(',')
         });
     },
-
+    loadOrderBook: function(token, accountNumber, page) {
+        var url = getOrdersUrl.replace('{id}', accountNumber);
+        return ajaxJson('get', url, token, {index: page});
+    },
+    deleteOrder: function(token, accountNumber, orderId) {
+        var url = deleteOrderUrl
+            .replace('{id}', accountNumber)
+            .replace('{orderId}', orderId);
+        return ajaxJson('delete', url, token)
+    }
   }
 })
-.service('finfoService', function($http){
+.service('finfoService', function($http, $q){
+    MessageUnmashaller = {
+        SEPARATOR: "|",
+        map: {
+            //default message type
+            //"STOCK", "MARKETINFO", "TRANSACTION", "PUT", "PUTEXEC"
+            STOCK: function (mess){
+                var arr = mess.split(MessageUnmashaller.SEPARATOR);
+                if (arr.length < 40){
+                    console.error("StockInfo message structre is change. ");
+                    //return;
+                }
+                itemInfo = {};
+                itemInfo.floorCode = arr[0];
+                itemInfo.tradingDate = arr[1];
+                itemInfo.time = arr[2];
+                itemInfo.code = arr[3];
+                itemInfo.companyName = arr[4];
+                itemInfo.stockType = arr[5];
+                itemInfo.totalRoom = arr[6];
+                itemInfo.currentRoom = arr[7];
+                itemInfo.basicPrice = arr[8];
+                itemInfo.openPrice = arr[9];
+                itemInfo.closePrice = arr[10];
+                itemInfo.currentPrice = arr[11];
+                itemInfo.currentQtty = arr[12];
+                itemInfo.highestPrice = arr[13];
+                itemInfo.lowestPrice = arr[14];
+                itemInfo.ceilingPrice = arr[15];
+                itemInfo.floorPrice = arr[16];
+                itemInfo.totalOfferQtty = arr[17];
+                itemInfo.totalBidQtty = arr[18];
+                itemInfo.matchPrice = arr[19];
+                itemInfo.matchQtty = arr[20];
+                itemInfo.matchValue = arr[21];
+                itemInfo.averagePrice = arr[22];
+                itemInfo.bidPrice01 = arr[23];
+                itemInfo.bidQtty01 = arr[24];
+                itemInfo.bidPrice02 = arr[25];
+                itemInfo.bidQtty02 = arr[26];
+                itemInfo.bidPrice03 = arr[27];
+                itemInfo.bidQtty03 = arr[28];
+                itemInfo.offerPrice01 = arr[29];
+                itemInfo.offerQtty01 = arr[30];
+                itemInfo.offerPrice02 = arr[31];
+                itemInfo.offerQtty02 = arr[32];
+                itemInfo.offerPrice03 = arr[33];
+                itemInfo.offerQtty03 = arr[34];
+                itemInfo.accumulatedVal = arr[35];
+                itemInfo.accumulatedVol = arr[36];
+                itemInfo.buyForeignQtty = arr[37];
+                itemInfo.sellForeignQtty = arr[38];
+                itemInfo.projectOpen = arr[39];
+                itemInfo.sequence = arr[40];
+                return itemInfo;
+            }
+        },
+        regist: function(messType, unmashaller){
+            if (typeof unmashaller == "function"){
+                this.map[messType] = unmashaller;
+            }
+        },
+        unmashall: function(messType, mess){
+            if (typeof this.map[messType] == "undefined" ){
+                return mess;
+            } 
+            return this.map[messType](mess);
+        }
+    };
 
     loadAllStocks = function() {
         return $http({
@@ -90,11 +169,30 @@ angular.module('tradingApp.services', [])
     };
 
     getStock = function(symbol) {
-        var secInfoUrl = 'https://www.vndirect.com.vn/secinfoservice/rest/';
-        var url = secInfoUrl + 'secInfo/getSecInfo?callback=JSON_CALLBACK&code=' + symbol;
-        return $http.jsonp(url, {
-            method: 'get'
-        });
+        // var secInfoUrl = 'https://www.vndirect.com.vn/secinfoservice/rest/';
+
+        // var url = secInfoUrl + 'secInfo/getSecInfo?callback=JSON_CALLBACK&code=' + symbol;
+        // return $http.jsonp(url, {
+            // method: 'get'
+        // });
+        var def = $q.defer();
+
+        var stockUrl = 'https://priceservice.vndirect.com.vn/priceservice/secinfo/snapshot/q=codes:' + symbol;
+        $http({
+            method: 'get',
+            url: stockUrl
+        }).then(function(res){
+            if (!res.data || res.data.length == 0 ) {
+                def.reject();
+                return;
+            }
+            var stockInfo = MessageUnmashaller.map.STOCK(res.data[0]);
+            def.resolve(stockInfo);
+        }, function(){
+            def.reject();
+        })
+
+        return def.promise;
     }
     return {
         getStocks: function() {

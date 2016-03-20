@@ -9,15 +9,15 @@ navigation history that also transitions its views in and out.
     <ion-nav-view name="tab-account"></ion-nav-view>
   </ion-tab>
   
-  <ion-tab id="marketPage" title="Thị trường" icon-off="icon-ios-market" icon-on="icon-ios-market-active" href="">
-    <ion-nav-view name="tab-market"></ion-nav-view>
+  <ion-tab id="marketPage" title="Thị trường" icon-off="icon-ios-market" icon-on="icon-ios-market-active" href="#/tab/market-info">
+    <ion-nav-view name="tab-market-info"></ion-nav-view>
   </ion-tab>
 
   <ion-tab id="tradingPage" title="Giao dịch" icon-off="icon-ios-trading" icon-on="icon-ios-trading-active" href="#/tab/trading" ng-click="loadData(2);">
     <ion-nav-view name="tab-trading"></ion-nav-view>
   </ion-tab>
 
-  <ion-tab id="notificationPage" title="Thông báo" icon-off="icon-ios-notification" icon-on="icon-ios-notification-active" href="">
+  <ion-tab id="notificationPage" title="Thông báo" icon-off="icon-ios-notification" icon-on="icon-ios-notification-active" href="#/tab/notification">
     <ion-nav-view name="tab-notification"></ion-nav-view>
   </ion-tab>
 

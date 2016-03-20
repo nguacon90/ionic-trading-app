@@ -69,6 +69,24 @@ angular.module('tradingApp', ['ionic', 'tradingApp.controllers', 'tradingApp.ser
         }
       }
     })
+  .state('tab.market-info', {
+    url: '/market-info',
+    views: {
+      'tab-market-info': {
+        templateUrl:'templates/tab-market-info.html',
+        controller: 'MarketInfoCtrl'
+      }
+    }
+  })
+  .state('tab.notification', {
+    url: '/notification',
+    views: {
+      'tab-notification': {
+        templateUrl:'templates/tab-notification.html',
+        controller: 'NotificationCtrl'
+      }
+    }
+  })
   .state('tab.trading-account-list', {
     url: 'trading/account/list',
     views: {
